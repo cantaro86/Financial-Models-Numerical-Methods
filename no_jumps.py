@@ -18,7 +18,7 @@ from copy import deepcopy
 import cost_utils as cost
 
 t=time.time()    
-    
+np.seterr(all='ignore')                        
 #%%    
 
 
@@ -40,7 +40,7 @@ gamma = 0.01              # risk avversion coefficient
 #%%
 #def trans_cost_NJ( T=1, S0=15, K=15, r=0.1, mu=0.1, sig=0.25, cost=0.005, gamma=0.1, N=800  ):
 
-N = 50          # time steps even!!!
+N = 500          # time steps even!!!
 
         
 dt = T/N
@@ -52,7 +52,7 @@ dx = sig * np.sqrt(dt)
 
 M = int(np.floor(N/2))
 dy = dx
-y = np.longfloat(np.linspace(-M*dy,M*dy,2*M+1))       
+y = np.linspace(-M*dy,M*dy,2*M+1)       
 N_y = len(y)
 med = np.where(y == 0)[0].item()
 
@@ -66,15 +66,15 @@ G = lambda x,m,N: np.exp( -gamma * (1-cost_s)*np.exp(x)*m / delta[N] )
 
 for TYPE in range(2):
 
-    x = np.array( [x0 + (mu-0.5*sig**2)*dt*N + (2*i-N)*dx for i in range(N+1) ] , dtype=np.float128 )
+    x = np.array( [x0 + (mu-0.5*sig**2)*dt*N + (2*i-N)*dx for i in range(N+1) ] )
     
     ############# Boundary conditions ##############
 
     # Terminal
     if TYPE == 0:
-        Q = np.exp( np.longfloat( -gamma * np.longfloat( cost.no_opt(x,y,cost_b,cost_s)) ))
+        Q = np.exp( -gamma * cost.no_opt(x,y,cost_b,cost_s) ) 
     else:
-        Q = np.exp( np.longfloat( -gamma * np.longfloat( cost.writer(x,y,cost_b,cost_s,K)) ))
+        Q = np.exp( -gamma * cost.writer(x,y,cost_b,cost_s,K) )
 
 
     for k in range(N-1,-1,-1):
@@ -83,16 +83,16 @@ for TYPE in range(2):
         Q_new = ( Q[:-1,:] + Q[1:,:] ) / 2
 
         ### create the logprice vector at time k
-        x = np.array( [x0 + (mu-0.5*sig**2)*dt*k + (2*i-k)*dx for i in range(k+1) ] , dtype=np.float128)
+        x = np.array( [x0 + (mu-0.5*sig**2)*dt*k + (2*i-k)*dx for i in range(k+1) ] )
 
 
         ### buy term
-        Buy = np.longfloat(deepcopy(Q_new))
-        Buy[:,:-1] = np.longfloat( np.matlib.repmat(F(x,dy,k),N_y-1,1).transpose() ) * np.longfloat( Q_new[:,1:] ) 
+        Buy = deepcopy(Q_new)
+        Buy[:,:-1] = np.matlib.repmat(F(x,dy,k),N_y-1,1).T * Q_new[:,1:]  
 
         ### sell term
-        Sell = np.longfloat(deepcopy(Q_new))
-        Sell[:,1:] = np.matlib.repmat(G(x,dy,k),N_y-1,1).transpose() * np.longfloat( Q_new[:,:-1] )
+        Sell = deepcopy(Q_new)
+        Sell[:,1:] = np.matlib.repmat(G(x,dy,k),N_y-1,1).T * Q_new[:,:-1] 
 
         ### update the Q(:,:,k) 
         Q = np.minimum( np.minimum(Buy,Sell) , Q_new )
