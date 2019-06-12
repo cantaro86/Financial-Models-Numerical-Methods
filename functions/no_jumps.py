@@ -14,7 +14,7 @@ print(sys.version)
 
 import numpy as np
 import numpy.matlib
-from copy import deepcopy
+#from copy import deepcopy
 import cost_utils as cost
 
 t=time.time()    
@@ -40,7 +40,7 @@ gamma = 0.01              # risk avversion coefficient
 #%%
 #def trans_cost_NJ( T=1, S0=15, K=15, r=0.1, mu=0.1, sig=0.25, cost=0.005, gamma=0.1, N=800  ):
 
-N = 500          # time steps even!!!
+N = 1000          # time steps even!!!
 
         
 dt = T/N
@@ -87,11 +87,13 @@ for TYPE in range(2):
 
 
         ### buy term
-        Buy = deepcopy(Q_new)
+        Buy = np.copy(Q_new)   #np.zeros(Q_new.shape)
+        #Buy[:,-1] = deepcopy(Q_new[:,-1])
         Buy[:,:-1] = np.matlib.repmat(F(x,dy,k),N_y-1,1).T * Q_new[:,1:]  
 
         ### sell term
-        Sell = deepcopy(Q_new)
+        Sell = np.copy(Q_new)  #np.zeros(Q_new.shape)
+        #Sell[:,0] = deepcopy(Q_new[:,0])
         Sell[:,1:] = np.matlib.repmat(G(x,dy,k),N_y-1,1).T * Q_new[:,:-1] 
 
         ### update the Q(:,:,k) 
