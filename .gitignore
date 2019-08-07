@@ -9,7 +9,13 @@
 *backup
 
 *.sty
+*.png
 *.pdf
 *~
-__*
-*checkpoints*
+
+.ipynb_checkpoints
+temp/
+functions/__pycache__/
+functions/cython/build/
+functions/cython/__pycache__/
+functions/C/*.o
