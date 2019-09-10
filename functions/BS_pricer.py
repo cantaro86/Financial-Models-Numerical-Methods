@@ -11,6 +11,8 @@ from scipy.sparse.linalg import spsolve
 from scipy import sparse
 from scipy.sparse.linalg import splu
 import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+from matplotlib import cm
 from time import time
 import scipy.stats as ss
 from functions.Solvers import Thomas
@@ -39,6 +41,7 @@ class BS_pricer():
         self.price = 0
         self.S_vec = None
         self.price_vec = None
+        self.mesh = None
         self.exercise = Option_info.exercise
         self.payoff = Option_info.payoff
         
@@ -71,6 +74,7 @@ class BS_pricer():
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
     
+    
     def closed_formula(self):
         """ Black Scholes closed formula:
         """
@@ -99,8 +103,8 @@ class BS_pricer():
         Nspace = steps[0]   
         Ntime = steps[1]
         
-        S_max = 3*float(self.K)                
-        S_min = float(self.K)/3
+        S_max = 6*float(self.K)                
+        S_min = float(self.K)/6
         x_max = np.log(S_max)
         x_min = np.log(S_min)
         x0 = np.log(self.S0)                            # current log-price
@@ -108,7 +112,8 @@ class BS_pricer():
         x, dx = np.linspace(x_min, x_max, Nspace, retstep=True)  
         t, dt = np.linspace(0, self.T, Ntime, retstep=True)
         
-        Payoff = self.payoff_f(np.exp(x))
+        self.S_vec = np.exp(x)        # vector of S
+        Payoff = self.payoff_f(self.S_vec)
 
         V = np.zeros((Nspace,Ntime))
         if self.payoff == "call":
@@ -180,8 +185,8 @@ class BS_pricer():
             raise ValueError("Solver is splu, spsolve, SOR or Thomas")    
         
         self.price = np.interp(x0, x, V[:,0])
-        self.S_vec = np.exp(x)
         self.price_vec = V[:,0]
+        self.mesh = V
         
         if (Time == True):
             elapsed = time()-t_init
@@ -190,8 +195,7 @@ class BS_pricer():
             return self.price
     
     
-    
-    
+       
     def plot(self, axis=None):
         if (type(self.S_vec) != np.ndarray or type(self.price_vec) != np.ndarray):
             self.PDE_price((7000,5000))
@@ -207,3 +211,20 @@ class BS_pricer():
         plt.title("Black Scholes price")
         plt.legend(loc='upper left')
         plt.show()
+        
+        
+    def mesh_plt(self):
+        if (type(self.S_vec) != np.ndarray or type(self.mesh) != np.ndarray):
+            self.PDE_price((7000,5000))
+            
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        
+        X, Y = np.meshgrid( np.linspace(0, self.T, self.mesh.shape[1]) , self.S_vec)
+        ax.plot_surface(Y, X, self.mesh, cmap=cm.ocean)
+        ax.set_title("BS price surface")
+        ax.set_xlabel("S"); ax.set_ylabel("t"); ax.set_zlabel("V")
+        ax.view_init(30, -100) # this function rotates the 3d plot
+        plt.show()
+        
+        
