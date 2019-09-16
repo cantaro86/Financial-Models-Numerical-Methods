@@ -1,5 +1,5 @@
 *.aux
-*.bbl
+#*.bbl
 *.blg
 *.log
 *.maf
@@ -10,7 +10,7 @@
 
 *.sty
 *.png
-*.pdf
+#*.pdf
 *~
 
 .ipynb_checkpoints
