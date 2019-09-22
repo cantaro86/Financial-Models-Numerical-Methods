@@ -166,7 +166,7 @@ class VG_pricer():
         else:    
             V[:,-1] = Payoff
             V[-extraP-1:,:] = 0
-            V[:extraP+1,:] = self.K
+            V[:extraP+1,:] = self.K * np.exp(-self.r* t[::-1] ) * np.ones((extraP+1,Ntime))
         
         
         A = self.theta/(self.sigma**2)

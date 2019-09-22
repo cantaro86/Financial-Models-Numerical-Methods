@@ -123,7 +123,7 @@ class BS_pricer():
         else:    
             V[:,-1] = Payoff
             V[-1,:] = 0
-            V[0,:] = self.K
+            V[0,:] = self.K * np.exp(-self.r* t[::-1] )
         
         sig2 = self.sig**2 
         dxx = dx**2

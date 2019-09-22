@@ -115,7 +115,7 @@ class Merton_pricer():
         else:    
             V[:,-1] = Payoff
             V[-extraP-1:,:] = 0
-            V[:extraP+1,:] = self.K
+            V[:extraP+1,:] = self.K * np.exp(-self.r* t[::-1] ) * np.ones((extraP+1,Ntime))
         
         
         cdf = ss.norm.cdf([np.linspace(-(extraP+1+0.5)*dx, (extraP+1+0.5)*dx, 2*(extraP+2) )], loc=self.muJ, scale=self.sigJ)[0]
