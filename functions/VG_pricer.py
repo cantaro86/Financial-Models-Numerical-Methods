@@ -10,6 +10,7 @@ from scipy import sparse
 from scipy.sparse.linalg import splu
 from time import time
 import numpy as np
+import scipy as scp
 from scipy import signal
 from scipy.integrate import quad
 import scipy.stats as ss
@@ -18,6 +19,9 @@ import scipy.special as scps
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 from matplotlib import cm
+from functions.CF import cf_VG
+from functions.probabilities import Q1, Q2
+from functools import partial
 
 
 class VG_pricer():
@@ -39,6 +43,7 @@ class VG_pricer():
         self.sigma = Process_info.sigma       # VG parameter
         self.theta = Process_info.theta       # VG parameter
         self.kappa = Process_info.kappa       # VG parameter
+        self.exp_RV = Process_info.exp_RV     # function to generate exponential VG Random Variables
         
         self.S0 = Option_info.S0          # current price
         self.K = Option_info.K            # strike
@@ -60,10 +65,11 @@ class VG_pricer():
             Payoff = np.maximum( self.K - S, 0 )  
         return Payoff
     
+ 
     
-    def closed_formula1(self):
+    def closed_formula(self):
         """ 
-        VG closed formula.   IMPLEMENT the PUT
+        VG closed formula.  Put is obtained by put/call parity.
         """
         
         def Psy(a,b,g):
@@ -85,48 +91,56 @@ class VG_pricer():
             self.K * np.exp(-self.r*self.T) * Psy( d * np.sqrt((1-c2)/self.kappa) , \
                             (alpha) * np.sqrt(self.kappa/(1-c2)) , self.T/self.kappa )
         
-        return call
-
+        if self.payoff == "call":
+            return call
+        elif self.payoff == "put":
+            return call - self.S0 + self.K * np.exp(-self.r * self.T)
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+        
     
-    def closed_formula2(self):
-        """ 
-        VG closed formula. TEST to be removed or fixed.  IMPLEMENT the PUT
+    def Fourier_inversion(self):
         """
-        def Phi(alpha,beta,gamm,x,y):
-
-            f = lambda u: u**(alpha-1) * (1-u)**(gamm-alpha-1) * (1-u*x)**(-beta) * np.exp(u*y)
-            result = quad(f, 0.00000001, 0.99999999)
-            return ( scps.gamma(gamm) / (scps.gamma(alpha)*scps.gamma(gamm - alpha)) ) * result[0]
-
-        def Psy(a,b,g):
-
-            c= np.abs(a) * np.sqrt(2+b**2)
-            u= b / np.sqrt(2+b**2)
-
-            value = ( c**(g+0.5) * np.exp(np.sign(a)*c) * (1+u)**g ) / ( np.sqrt(2*np.pi) * g * scps.gamma(g) ) * \
-                scps.kv(g+0.5 ,c) *  Phi( g,1-g,1+g, (1+u)/2, -np.sign(a)*c*(1+u) ) - \
-                np.sign(a) * ( c**(g+0.5) * np.exp(np.sign(a)*c) * (1+u)**(1+g) ) / ( np.sqrt(2*np.pi) * (g+1) * scps.gamma(g) ) *\
-                scps.kv(g-0.5 ,c) *  Phi( g+1,1-g,2+g, (1+u)/2, -np.sign(a)*c*(1+u) ) + \
-                np.sign(a) * ( c**(g+0.5) * np.exp(np.sign(a)*c) * (1+u)**(1+g) ) / ( np.sqrt(2*np.pi) * (g+1) * scps.gamma(g) ) *\
-                scps.kv(g-0.5 ,c) *  Phi( g,1-g,1+g, (1+u)/2, -np.sign(a)*c*(1+u) )
-            return value        
+        Price obtained by inversion of the characteristic function
+        """
+        k = np.log(self.K/self.S0)                # log moneyness
+        w = -np.log(1 - self.theta * self.kappa - self.kappa/2 * self.sigma**2 ) /self.kappa    # coefficient w
+        cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-w), theta=self.theta, sigma=self.sigma, kappa=self.kappa ) 
         
-        # Ugly parameters
-        xi = - self.theta / self.sigma**2
-        s = self.sigma / np.sqrt( 1+ ((self.theta/self.sigma)**2) * (self.kappa/2) )
-        alpha = xi * s
-    
-        c1 = self.kappa/2 * (alpha + s)**2 
-        c2 = self.kappa/2 * alpha**2
-        d = 1/s * ( np.log(self.S0/self.K) + self.r*self.T + self.T/self.kappa * np.log( (1-c1)/(1-c2) )  )
+        if self.payoff == "call":
+            call = self.S0 * Q1(k, cf_VG_b, np.inf) - self.K * np.exp(-self.r*self.T) * Q2(k, cf_VG_b, np.inf)   # pricing function
+            return call
+        elif self.payoff == "put":
+            put = self.K * np.exp(-self.r*self.T) * (1 - Q2(k, cf_VG_b, np.inf)) - self.S0 * (1-Q1(k, cf_VG_b, np.inf))  # pricing function
+            return put
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
 
-        # Closed formula 
-        call = self.S0 * Psy( d * np.sqrt((1-c1)/self.kappa) , (alpha+s) * np.sqrt(self.kappa/(1-c1)) , self.T/self.kappa ) - \
-            self.K * np.exp(-self.r*self.T) * Psy( d * np.sqrt((1-c2)/self.kappa) , \
-                            (alpha) * np.sqrt(self.kappa/(1-c2)) , self.T/self.kappa )
-        
-        return call
+
     
+    def MC(self, N, Err=False, Time=False):
+        """
+        Variance Gamma Monte Carlo
+        Err = return Standard Error if True
+        Time = return execution time if True
+        """
+        t_init = time()
+             
+        S_T = self.exp_RV( self.S0, self.T, N )
+        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T) )
+        
+        if (Err == True):
+            if (Time == True):
+                elapsed = time()-t_init
+                return V, ss.sem(np.exp(-self.r*self.T) * self.payoff_f(S_T)), elapsed
+            else:
+                return V, ss.sem(np.exp(-self.r*self.T) * self.payoff_f(S_T))
+        else:
+            if (Time == True):
+                elapsed = time()-t_init
+                return V, elapsed
+            else:
+                return V        
     
     
     
@@ -252,4 +266,48 @@ class VG_pricer():
         ax.set_xlabel("S"); ax.set_ylabel("t"); ax.set_zlabel("V")
         ax.view_init(30, -100) # this function rotates the 3d plot
         plt.show()    
+   
+
+
+    def closed_formula_wrong(self):
+        """ 
+        VG closed formula. This implementation seems correct, BUT IT DOES NOT WORK!!
+        Here I use the closed formula of Carr,Madan,Chang 1998. With scps.kv, a modified Bessel function of second kind.
+        You can try to run it, but the output is slightly different from expected.
+        """
+        def Phi(alpha,beta,gamm,x,y):
+
+            f = lambda u: u**(alpha-1) * (1-u)**(gamm-alpha-1) * (1-u*x)**(-beta) * np.exp(u*y)
+            result = quad(f, 0.00000001, 0.99999999)
+            return ( scps.gamma(gamm) / (scps.gamma(alpha)*scps.gamma(gamm - alpha)) ) * result[0]
+
+        def Psy(a,b,g):
+
+            c= np.abs(a) * np.sqrt(2+b**2)
+            u= b / np.sqrt(2+b**2)
+
+            value = ( c**(g+0.5) * np.exp(np.sign(a)*c) * (1+u)**g ) / ( np.sqrt(2*np.pi) * g * scps.gamma(g) ) * \
+                scps.kv(g+0.5 ,c) *  Phi( g,1-g,1+g, (1+u)/2, -np.sign(a)*c*(1+u) ) - \
+                np.sign(a) * ( c**(g+0.5) * np.exp(np.sign(a)*c) * (1+u)**(1+g) ) / ( np.sqrt(2*np.pi) * (g+1) * scps.gamma(g) ) *\
+                scps.kv(g-0.5 ,c) *  Phi( g+1,1-g,2+g, (1+u)/2, -np.sign(a)*c*(1+u) ) + \
+                np.sign(a) * ( c**(g+0.5) * np.exp(np.sign(a)*c) * (1+u)**(1+g) ) / ( np.sqrt(2*np.pi) * (g+1) * scps.gamma(g) ) *\
+                scps.kv(g-0.5 ,c) *  Phi( g,1-g,1+g, (1+u)/2, -np.sign(a)*c*(1+u) )
+            return value        
         
+        # Ugly parameters
+        xi = - self.theta / self.sigma**2
+        s = self.sigma / np.sqrt( 1+ ((self.theta/self.sigma)**2) * (self.kappa/2) )
+        alpha = xi * s
+    
+        c1 = self.kappa/2 * (alpha + s)**2 
+        c2 = self.kappa/2 * alpha**2
+        d = 1/s * ( np.log(self.S0/self.K) + self.r*self.T + self.T/self.kappa * np.log( (1-c1)/(1-c2) )  )
+
+        # Closed formula 
+        call = self.S0 * Psy( d * np.sqrt((1-c1)/self.kappa) , (alpha+s) * np.sqrt(self.kappa/(1-c1)) , self.T/self.kappa ) - \
+            self.K * np.exp(-self.r*self.T) * Psy( d * np.sqrt((1-c2)/self.kappa) , \
+                            (alpha) * np.sqrt(self.kappa/(1-c2)) , self.T/self.kappa )
+        
+        return call
+
+     

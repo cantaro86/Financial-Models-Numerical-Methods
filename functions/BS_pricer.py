@@ -7,6 +7,7 @@ Created on Thu Jun 13 10:18:39 2019
 """
 
 import numpy as np
+import scipy as scp
 from scipy.sparse.linalg import spsolve
 from scipy import sparse
 from scipy.sparse.linalg import splu
@@ -17,6 +18,10 @@ from time import time
 import scipy.stats as ss
 from functions.Solvers import Thomas
 from functions.cython.cython_functions import SOR
+from functions.CF import cf_normal
+from functions.probabilities import Q1, Q2
+from functools import partial
+
 
 
 class BS_pricer():
@@ -37,6 +42,7 @@ class BS_pricer():
         self.S0 = Option_info.S0          # current price
         self.K = Option_info.K            # strike
         self.T = Option_info.T            # maturity in years
+        self.exp_RV = Process_info.exp_RV # function to generate solution of GBM
         
         self.price = 0
         self.S_vec = None
@@ -76,7 +82,8 @@ class BS_pricer():
     
     
     def closed_formula(self):
-        """ Black Scholes closed formula:
+        """ 
+        Black Scholes closed formula:
         """
         d1 = (np.log(self.S0/self.K) + (self.r + self.sig**2 / 2) * self.T) / (self.sig * np.sqrt(self.T))
         d2 = (np.log(self.S0/self.K) + (self.r - self.sig**2 / 2) * self.T) / (self.sig * np.sqrt(self.T))
@@ -87,6 +94,50 @@ class BS_pricer():
             return self.K * np.exp(-self.r * self.T) * ss.norm.cdf( -d2 ) - self.S0 * ss.norm.cdf( -d1 )
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
+    
+    
+    
+    def Fourier_inversion(self):
+        """
+        Price obtained by inversion of the characteristic function
+        """
+        k = np.log(self.K/self.S0)
+        cf_GBM = partial(cf_normal, mu=( self.r - 0.5 * self.sig**2 )*self.T, sig=self.sig*np.sqrt(self.T))  # function binding
+        
+        if self.payoff == "call":
+            call = self.S0 * Q1(k, cf_GBM, np.inf) - self.K * np.exp(-self.r*self.T) * Q2(k, cf_GBM, np.inf)   # pricing function
+            return call
+        elif self.payoff == "put":
+            put = self.K * np.exp(-self.r*self.T) * (1 - Q2(k, cf_GBM, np.inf)) - self.S0 * (1-Q1(k, cf_GBM, np.inf))  # pricing function
+            return put
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+            
+            
+    
+    def MC(self, N, Err=False, Time=False):
+        """
+        BS Monte Carlo
+        Err = return Standard Error if True
+        Time = return execution time if True
+        """
+        t_init = time()
+             
+        S_T = self.exp_RV( self.S0, self.T, N )
+        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T) )
+        
+        if (Err == True):
+            if (Time == True):
+                elapsed = time()-t_init
+                return V, ss.sem(np.exp(-self.r*self.T) * self.payoff_f(S_T)), elapsed
+            else:
+                return V, ss.sem(np.exp(-self.r*self.T) * self.payoff_f(S_T))
+        else:
+            if (Time == True):
+                elapsed = time()-t_init
+                return V, elapsed
+            else:
+                return V
     
     
     
@@ -227,4 +278,45 @@ class BS_pricer():
         ax.view_init(30, -100) # this function rotates the 3d plot
         plt.show()
         
+        
+    def LSM(self, N=10000, paths=10000, order=2):
+        """
+        Longstaff-Schwartz Method for pricing American options
+        
+        N = number of time steps
+        paths = number of generated paths
+        order = order of the polynomial for the regression 
+        """
+        
+        if self.payoff!="put":
+            raise ValueError("invalid type. Set 'call' or 'put'")
+        
+        dt = self.T/(N-1)          # time interval
+        df = np.exp(-self.r * dt)  # discount factor per time time interval
+        
+        X0 = np.zeros((paths,1))
+        increments = ss.norm.rvs(loc=(self.r-self.sig**2/2)*dt, scale=np.sqrt(dt)*self.sig, size=(paths,N-1))
+        X = np.concatenate((X0,increments), axis=1).cumsum(1)
+        S = self.S0 * np.exp(X)
+        
+        H = np.maximum(self.K - S, 0)   # intrinsic values for put option
+        V = np.zeros_like(H)            # value matrix
+        V[:,-1] = H[:,-1]
+
+        # Valuation by LS Method
+        for t in range(N-2, 0, -1):
+            good_paths = H[:,t] > 0    
+            rg = np.polyfit( S[good_paths, t], V[good_paths, t+1] * df, 2)    # polynomial regression
+            C = np.polyval( rg, S[good_paths,t] )                             # evaluation of regression  
+    
+            exercise = np.zeros( len(good_paths), dtype=bool)
+            exercise[good_paths] = H[good_paths,t] > C
+    
+            V[exercise,t] = H[exercise,t]
+            V[exercise,t+1:] = 0
+            discount_path = (V[:,t] == 0)
+            V[discount_path,t] = V[discount_path,t+1] * df
+    
+        V0 = np.mean(V[:,1]) * df  # 
+        return V0
         

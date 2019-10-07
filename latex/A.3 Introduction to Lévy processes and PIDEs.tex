@@ -158,9 +158,9 @@ We say that $\{X_t\}_{t \ge 0}$ is a \textbf{Lévy Process} if:
 It can be proven that Lévy processes have ``cádlág''
 paths, i.e. paths which are right-continuous and have left limits. 
 
-Lévy processes are intrinsically connected with infinitely divisible distributions. In particular the Lévy-Khintchine formula 
-for infinitely divisible random variables, is an essential tool for the classification of the Lévy processes by the form of their
-characteristic functions.
+%Lévy processes are intrinsically connected with infinitely divisible distributions. In particular the Lévy-Khintchine formula 
+%for infinitely divisible random variables, is an essential tool for the classification of the Lévy processes by the form of their
+%characteristic functions.
 
 \begin{Definition} \label{chf}
 Let $X: \Omega \to \R$ be a random variable.\\ 
@@ -193,12 +193,12 @@ Let $\nu(dx)$ be a measure on $\R$. We say it is a \textbf{Lévy measure} if it 
  \int_{\R} \min\{1, x^2\} \nu(dx) < \infty.
 \end{equation}
 \end{Definition}
-The characteristic function of a Lévy processes at time $t\geq 0$ has the following \textbf{Lévy Khintchine representation}:
+The characteristic function of a Lévy processes at a fixed time $t\geq 0$ has the following \textbf{Lévy Khintchine representation}:
 \begin{Theorem}
  Let $X_t$ be the random value of a Lévy process at time $t\geq0$. Then there exist $b\in R$, $\sigma>0$
  and a Lévy measure $\nu$ on $\R$, such that $\forall u \in \R$:
 \begin{align}
-\phi_{X_t}(u)  &= \mathbb{E} [e^{iuX}] \\ 
+\phi_{X_t}(u)  &= \mathbb{E} [e^{iuX_t}] \\ 
 	     &= e^{t \eta(u)} \nonumber \\
 	     &= \exp \left[ t \left( ibu - \frac{1}{2} \sigma^2 u^2 + \int_{\R} 
 	         ( e^{iux} -1 -iux \mathbbm{1}_{(|x|<1)}(x) ) \nu(dx) \right) \right]. \nonumber		      
@@ -282,7 +282,7 @@ We can further define:
 that represents the compensated sum of small jumps.
 
  
-\subsection{Lévy-It\={o} decomposition}
+\subsection{Lévy-It\={o} decomposition} \label{LevyIto_sec}
 
 The following is a fundamental theorem which decomposes a general Lévy process in a superposition 
 of independent processes: a drift term, a Brownian motion, a Poisson process with ``big jumps'' and a compensated Poisson process with ``small jumps''.
@@ -717,11 +717,10 @@ Let us recall the pricing formula for a derivative contract:
   V(t,x) = \E^{\Q}  \biggl[ D(t,T) V(T,X_T) \bigg| X_t = x \biggr] . 
  \end{equation}
 
-The derivative pricing function $V(t,x)$ with $t \in [0,T]$ and $s \in \R$, can be obtained by solving a pricing PIDE according to the following theorem.
+The derivative pricing function $V(t,x)$ with $t \in [0,T]$ and $x \in \R$, can be obtained by solving a pricing PIDE according to the following theorem.
 \begin{Theorem}
  Let us consider an arbitrage free market, where the underlying stock log-price follows the Lévy process (\ref{SDE_log_var2}). 
- Let also assume that $V(t,x) \in C^{1,2}([t_0,T] \times \R)$ and that the partial derivatives are all bounded by a quadratic function.
- The payoff $\Phi(\cdot)$ is such that $\E[\Phi(X_T)]< \infty$. 
+ Let also assume that $V(t,x) \in C^{1,2}([t_0,T] \times \R)$ and that the partial derivatives are all bounded.
  Therefore $V(t,x)$ satisfies the PIDE
 \begin{align}\label{derivative_PIDE}
  & \frac{\partial V(t,x)}{\partial t} + \LL V(t,x) -r V(t,x) = 0 \\
@@ -734,16 +733,41 @@ Since it involves advanced mathematical concepts, the reader can skip it, if not
 \begin{proof}
  Let us consider the formula (\ref{derivative_price}). 
  For any stopping time $\tau$ such that $0 \leq t \leq \tau \leq T$, we can use the law of iterated expectations:
- \begin{equation*}
-   D(0,t) V(t,x) = \E^{\Q}  \biggl[ \E^{\Q} \bigl[ D(0,T) V(T,X_T) \big| X_{\tau} \bigr] \bigg| X_t \biggr] = \E^{\Q} \bigl[ D(0,\tau) V(\tau,X_{\tau}) \big| X_t \bigr]. 
- \end{equation*}
+ \begin{align*}
+   D(0,t) V(t,x) &= \E^{\Q}  \biggl[ \E^{\Q} \bigl[ D(0,T) V(T,X_T) \big| X_{\tau} \bigr] \bigg| X_t=x \biggr] \\
+                 &= \E^{\Q} \bigl[ D(0,\tau) V(\tau,X_{\tau}) \big| X_t=x \bigr]. 
+ \end{align*}
  We can write $D(0,\tau) V(\tau,X_{\tau}) = D(0,t) V(t,x) + \int_t^{\tau} d\bigl(D(t,u) V(u,X_u)\bigr) du$. 
- Using the It\=o formula, we get:
- $$ \E^{\Q} \biggl[ \int_t^{\tau} e^{-r(u-t)} \biggl( \frac{\partial V(u,X_u)}{\partial u} + \LL V(u,X_u) -r V(u,X_u) \biggr) du \bigg| X_t=x \biggr] = 0, $$
- where all the martingales terms have zero expectation. 
- In the last step we also introduced the explicit expression of the discount factor (\ref{discount_factor}) with constant $r$.
- 
- By definition, the terms inside the integral are all continuous and are all dominated by some quadratic functions that do not depend on $\tau$.
+ Using the It\=o formula (\ref{Ito_form}), we get:
+  \begin{align}\label{proof_Cont_V}
+  0 =& \; \E^{\Q} \biggl[ \int_t^{\tau} e^{-r(u-t)} \biggl( \frac{\partial V(u,X_{u^-})}{\partial u} + \LL V(u,X_{u^-}) -r V(u,X_{u^-}) \biggr) du \bigg| X_t=x \biggr] \\ \label{term1}
+     & + \E^{\Q} \biggl[ \int_t^{\tau} e^{-r(u-t)} \frac{\partial V(u,X_{u^-})}{\partial x} \sigma \; dW_u \; \bigg| X_t=x \biggr] \\ \label{term2}
+     & + \E^{\Q} \biggl[ \int_t^{\tau} e^{-r(u-t)} \int_{\R} \bigl( V(u,X_{u^-} + z) - V(u,X_{u^-}) \bigr) \tilde N(du,dz) \; \bigg| X_t=x \biggr]
+ \end{align}
+ where we introduced the explicit expression of the discount factor (\ref{discount_factor}) with constant $r$.
+ The terms inside the expectations in the second and third lines are well defined if they are square integrable martingales\footnote{A martingale $\{M_t\}_{t\geq0}$ is square 
+ integrable if $\E[M_t^2] < \infty$ for every $t$.}. Now we verify that they are well defined by using the well known \emph{It\=o isometry} 
+ (for more information see Chapter 8 of \cite{Cont}). 
+ Let us look at the integrability condition for the term (\ref{term1}). 
+  \begin{align*}
+  & \E^{\Q} \biggl[ \int_t^{\tau} \big| e^{-r(u-t)} \frac{\partial V(u,X_{u^-})}{\partial x} \sigma \big|^2 du \; \bigg| X_t=x \biggr] \\
+  & \leq \sigma^2 C^2\, \E^{\Q} \biggl[ \int_t^{\tau} \big| e^{-r(u-t)} \big|^2 du \; \bigg| X_t=x \biggr] < \infty
+ \end{align*}
+ where we used the fact that the derivative is bounded by a constant $C$.\\
+ Let us look at the integrability condition for the term (\ref{term2}).
+  \begin{align*}
+  & \E^{\Q} \biggl[ \int_t^{\tau} \int_{\R} \bigg| e^{-r(u-t)} \bigl( V(u,X_{u^-} + z) - V(u,X_{u^-}) \bigr) \bigg|^2 \nu(dz) dt \; \bigg| X_t=x \biggr]  \\
+  & \leq \E^{\Q} \biggl[ \int_t^{\tau} \int_{\R} \bigg| e^{-r(u-t)} C z \bigg|^2 \nu(dz) dt \; \bigg| X_t=x \biggr]  \\
+  & \leq C^2 \int_{\R} z^2 \nu(dz) \; \int_t^{T} \bigg| e^{-r(u-t)} \bigg|^2 dt < \infty. 
+  \end{align*}
+ In the second line we used the Lipschitz property of $V(t,x)$\footnote{A $C^1(\R)$ function $f$ with bounded derivative is Lipschitz. This can be easily proved.\\
+ Let $a,b \in \R$ with $a<b$, by the mean value theorem there exists $c\in [a,b]$ such that $f(b)-f(a) = f'(c) (b-a)$. Using $|f'(c)|\leq C$, we obtain the Lipschitz condition
+ $$ f(b)-f(a) \leq C (b-a). $$}.
+  In the third line, the integral $\int_{\R} z^2 \nu(dz)$ is finite thanks to (\ref{Levy_m}) and the finite second moment assumption (see Section \ref{LevyIto_sec}).\\
+  We just verified that these terms are square integrable martingales. It follows that their expectation is zero! \\
+  
+ Now let us consider (\ref{proof_Cont_V}).
+ By definition, the terms inside the integral are all continuous and are all bounded by some linear function.
  We can divide both sides by $(\tau-t)$ and take the limit for $\tau \to t$. Using the mean value theorem, there exists $u \in [t,\tau]$ such that 
  $$ \lim_{u \to t} \E^{\Q} \biggl[ e^{-r(u-t)} \biggl( \frac{\partial V(u,X_u)}{\partial u} + \LL V(u,X_u) -r V(u,X_u) \biggr) \bigg| X_t=x \biggr] = 0. $$
  When $\tau\to t$ also $u\to t$. Thanks to the dominated convergence theorem we can take the limit inside the expectation and conclude the proof.

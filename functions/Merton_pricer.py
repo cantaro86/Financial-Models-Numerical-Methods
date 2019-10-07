@@ -10,6 +10,7 @@ from scipy import sparse
 from scipy.sparse.linalg import splu
 from time import time
 import numpy as np
+import scipy as scp
 import scipy.stats as ss
 from scipy import signal
 import matplotlib.pyplot as plt
@@ -17,6 +18,9 @@ from mpl_toolkits import mplot3d
 from matplotlib import cm
 from functions.BS_pricer import BS_pricer
 from math import factorial
+from functions.CF import cf_mert
+from functions.probabilities import Q1, Q2
+from functools import partial
 
 
 class Merton_pricer():
@@ -40,6 +44,8 @@ class Merton_pricer():
         self.lam = Process_info.lam       # jump activity
         self.muJ = Process_info.muJ       # jump mean
         self.sigJ = Process_info.sigJ     # jump std
+        self.exp_RV = Process_info.exp_RV # function to generate exponential Merton Random Variables
+        
         self.S0 = Option_info.S0          # current price
         self.K = Option_info.K            # strike
         self.T = Option_info.T            # maturity in years
@@ -78,6 +84,50 @@ class Merton_pricer():
         return tot
            
     
+    def Fourier_inversion(self):
+        """
+        Price obtained by inversion of the characteristic function
+        """
+        k = np.log(self.K/self.S0)                # log moneyness
+        m = self.lam * (np.exp(self.muJ + (self.sigJ**2)/2) -1)    # coefficient m
+        cf_Mert = partial(cf_mert, t=self.T, mu=( self.r - 0.5 * self.sig**2 -m ), sig=self.sig, lam=self.lam, muJ=self.muJ, sigJ=self.sigJ )
+        
+        if self.payoff == "call":
+            call = self.S0 * Q1(k, cf_Mert, np.inf) - self.K * np.exp(-self.r*self.T) * Q2(k, cf_Mert, np.inf)   # pricing function
+            return call
+        elif self.payoff == "put":
+            put = self.K * np.exp(-self.r*self.T) * (1 - Q2(k, cf_Mert, np.inf)) - self.S0 * (1-Q1(k, cf_Mert, np.inf))  # pricing function
+            return put
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+
+
+    
+    def MC(self, N, Err=False, Time=False):
+        """
+        Merton Monte Carlo
+        Err = return Standard Error if True
+        Time = return execution time if True
+        """
+        t_init = time()
+             
+        S_T = self.exp_RV( self.S0, self.T, N )
+        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T) )
+        
+        if (Err == True):
+            if (Time == True):
+                elapsed = time()-t_init
+                return V, ss.sem(np.exp(-self.r*self.T) * self.payoff_f(S_T)), elapsed
+            else:
+                return V, ss.sem(np.exp(-self.r*self.T) * self.payoff_f(S_T))
+        else:
+            if (Time == True):
+                elapsed = time()-t_init
+                return V, elapsed
+            else:
+                return V
+            
+            
     
     def PIDE_price(self, steps, Time=False):
         """
