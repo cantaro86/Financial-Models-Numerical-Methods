@@ -12,7 +12,7 @@ import scipy.stats as ss
 
 class Diffusion_process():
     """
-    Class for the diffusion process (1-D):
+    Class for the diffusion process:
     r = risk free constant rate
     sig = constant diffusion coefficient
     mu = constant drift 
@@ -34,7 +34,7 @@ class Diffusion_process():
 
 class Merton_process():
     """
-    Class for the Merton process (1-D):
+    Class for the Merton process:
     r = risk free constant rate
     sig = constant diffusion coefficient
     lam = jump activity
@@ -68,7 +68,7 @@ class Merton_process():
        
 class VG_process():
     """
-    Class for the Variance Gamma process (1-D):
+    Class for the Variance Gamma process:
     r = risk free constant rate
     Using the representation of Brownian subordination, the parameters are: 
         theta = drift of the Brownian motion
@@ -98,3 +98,65 @@ class VG_process():
         VG = self.theta * G + self.sigma * np.sqrt(G) * Norm     # VG process at final time G
         S_T = S0 * np.exp( (self.r-w)*T + VG )                 # Martingale exponential VG       
         return S_T
+ 
+    
+    
+class Heston_process():
+    """
+    Class for the Heston process:
+    r = risk free constant rate
+    rho = correlation between stock noise and variance noise
+    theta = long term mean of the variance process
+    sigma = volatility coefficient of the variance process
+    kappa = mean reversion coefficient for the variance process
+    """
+    def __init__(self, r=0.1, rho=0, sigma=0.2, theta=-0.1, kappa=0.1):
+        self.r = r
+        if (np.abs(rho)>1):
+            raise ValueError("|rho| must be <=1")
+        self.rho = rho
+        if (theta<0 or sigma<0 or kappa<0):
+            raise ValueError("sigma,theta,kappa must be positive")
+        else:
+            self.theta = theta
+            self.sigma = sigma
+            self.kappa = kappa            
+
+
+class NIG_process():
+    """
+    Class for the Normal Inverse Gaussian process:
+    r = risk free constant rate
+    Using the representation of Brownian subordination, the parameters are: 
+        theta = drift of the Brownian motion
+        sigma = standard deviation of the Brownian motion
+        kappa = variance of the of the Gamma process 
+    """
+    def __init__(self, r=0.1, sigma=0.2, theta=-0.1, kappa=0.1):
+        self.r = r
+        self.theta = theta
+        if (sigma<0 or kappa<0):
+            raise ValueError("sigma and kappa must be positive")
+        else:
+            self.sigma = sigma
+            self.kappa = kappa
+            
+        # moments
+        self.var = self.sigma**2 + self.theta**2 * self.kappa 
+        self.skew = (3 * self.theta**3 * self.kappa**2 + 3*self.sigma**2 * self.theta * self.kappa) / (self.var**(1.5)) 
+        self.kurt = ( 3*self.sigma**4 * self.kappa +18*self.sigma**2 * self.theta**2 \
+                     * self.kappa**2 + 15*self.theta**4 * self.kappa**3 ) / (self.var**2)
+
+    def exp_RV(self, S0, T, N):
+        lam = T**2 / self.kappa     # scale for the IG process
+        mu_s = T / lam              # scaled mean
+        w = ( 1 - np.sqrt( 1 - 2*self.theta*self.kappa -self.kappa*self.sigma**2) )/self.kappa 
+        IG = ss.invgauss.rvs(mu=mu_s, scale=lam, size=N)         # The IG RV
+        Norm = ss.norm.rvs(0,1,N)                                # The normal RV  
+        X = self.theta * IG + self.sigma * np.sqrt(IG) * Norm    # NIG random vector
+        S_T = S0 * np.exp( (self.r-w)*T + X )                    # exponential dynamics        
+        return S_T
+
+
+
+ 

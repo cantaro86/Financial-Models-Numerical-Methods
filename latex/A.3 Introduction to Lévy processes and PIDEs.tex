@@ -526,12 +526,13 @@ The pdf of $X_t$ can be computed conditioning on the realization of $T_t$:
             K_{\frac{t}{\kappa}-\frac{1}{2}} 
             \biggl( \frac{1}{\bar\sigma^2} \sqrt{x^2 \bigl(\frac{2\bar\sigma^2}{\kappa}+\theta^2 \bigr)} \biggr),
 \end{align}
-where the function $K$ is a modified Bessel function of the second kind (see \cite{MCC98} for explicit computations).
-The characteristic function can be obtained by conditioning too: 
+where the function $K$ is a modified Bessel function of the second kind (see \cite{MCC98} for explicit computations).\\
+The characteristic function can be obtained from the composition of the Gamma moment generating function and the Normal characteristic functions: 
 \begin{align*}
- \phi_{X_t}(u) &= \biggl( 1-i \kappa \bigl( u\theta +\frac{i}{2}\bar\sigma^2 u^2 \bigr) \biggr)^{-\frac{t}{\kappa}} \\  
+ \phi_{X_t}(u) &= \biggl( 1- \kappa \bigl( i u\theta -\frac{1}{2}\bar\sigma^2 u^2 \bigr) \biggr)^{-\frac{t}{\kappa}} \\  
 	       &= \biggl( 1-i\theta \kappa u + \frac{1}{2} \bar\sigma^2 \kappa u^2 \biggr)^{-\frac{t}{\kappa}}.
 \end{align*}
+I will not prove the previous formula, but the interested reader can consult \cite{Applebaum} (Proposition 1.3.17 and Example 1.3.31).\\
 The VG Lévy measure is
 \begin{equation}\label{VG_measure}
  \nu^{X_t}(dx) = \frac{e^{\frac{\theta x}{\bar\sigma^2}}}{\kappa|x|} \exp 
