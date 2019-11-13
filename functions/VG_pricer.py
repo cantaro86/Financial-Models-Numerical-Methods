@@ -107,11 +107,12 @@ class VG_pricer():
         w = -np.log(1 - self.theta * self.kappa - self.kappa/2 * self.sigma**2 ) /self.kappa    # coefficient w
         cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-w), theta=self.theta, sigma=self.sigma, kappa=self.kappa ) 
         
+        right_lim = 5000         # using np.inf may create warnings 
         if self.payoff == "call":
-            call = self.S0 * Q1(k, cf_VG_b, np.inf) - self.K * np.exp(-self.r*self.T) * Q2(k, cf_VG_b, np.inf)   # pricing function
+            call = self.S0 * Q1(k, cf_VG_b, right_lim) - self.K * np.exp(-self.r*self.T) * Q2(k, cf_VG_b, right_lim)   # pricing function
             return call
         elif self.payoff == "put":
-            put = self.K * np.exp(-self.r*self.T) * (1 - Q2(k, cf_VG_b, np.inf)) - self.S0 * (1-Q1(k, cf_VG_b, np.inf))  # pricing function
+            put = self.K * np.exp(-self.r*self.T) * (1 - Q2(k, cf_VG_b, right_lim)) - self.S0 * (1-Q1(k, cf_VG_b, right_lim))  # pricing function
             return put
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
