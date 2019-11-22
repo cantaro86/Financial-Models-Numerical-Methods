@@ -1,48 +1,64 @@
-Financial-Models-Numerical-Methods  (not complete yet)
+Financial-Models-Numerical-Methods 
 ==================================
 
 
 This is a collection of [Jupyter notebooks](https://jupyter.org/) that are based on different topics in the area of quantitative finance.
 
 
-### Who is this tutorial for?
+### Is this a tutorial?
 
-This is not a tutorial for beginners. 
+Almost! :) 
 
-This tutorial is for readers with a basic knowledge in stochastic calculus, financial mathematics and statistics. A basic knowledge of python programming is also necessary.
+This is just a collection of topics and algorithms that in my opinion are interesting.     
+
+It contains several topics that are not so popular nowadays, but that can be very powerful. 
+Usually, topics such as PDE methods, Lévy processes, Fourier methods or Kalman filter are not very popular among practitioners, who prefers to work with more standard tools.     
+The aim of these notebooks is to present these interesting topics, by showing their practical application through an interactive python implementation.
+
+
+### Who are these notebooks for?
+
+Not for beginners. 
+
+These topics require a basic knowledge in stochastic calculus, financial mathematics and statistics. A basic knowledge of python programming is also necessary.
 
 In these notebooks I will not explain what is a call option, or what is a stochastic process, or a partial differential equation.     
 However, every time I will introduce a concept, I will also add a link to the corresponding wiki page or to a reference manual.
 In this way, the reader will be able to immediately understand what I am talking about. 
 
-This tutorial is for students in science, economics or finance who have followed at least one undergraduate course in financial mathematics and statistics.       
+These notes are for students in science, economics or finance who have followed at least one undergraduate course in financial mathematics and statistics.       
 Self-taught students or practicioners should have read at least an introductiory books in financial mathematics.
 
 
-### Is it really a tutorial?
+### Why is it worth to read these notes?  
 
-Probably no! :) 
+First of all, this is not a book!      
+Every notebook is (almost) independent from the others. Therefore you can select only the notebook you are interested in!
 
-This is a collection of topics and algorithms that in my opinion are interesting.     
+```diff
+- Every notebook, contains python code ready to use!     
+```
 
-Lévy processes are not very popular nowadays, but they are very powerful. 
-The Kalman filter is a very powerful tool as well, but it is hard to find examples of financial applications in the web.       
-In mathematics and statistics, there are many topics that at first sight seem easy, but thet are really understood only when you start working with them. I collected many of these topics in the notebooks.
+It is not easy to find on internet examples of financial models implemented in python which are ready to use and well documented.    
+I think that beginners in quantitative finance will find these notebooks very useful!  
 
-The aim of the tutorial is to give some space to interesting topics, and their practical implementation.
-
-
-### Why is it worth to read it?  
-
-First of all, this is not a book! Every notebook is (almost) independent from the others.    
-Therefore you can select only the notebook you are interested in!
-
-**Every notebook, contains python code ready to use!**     
-Jupyter notebooks are interactive i.e. you can run the code inside the notebook. 
+Moreover, Jupyter notebooks are interactive i.e. you can run the code inside the notebook. 
 This is probably the best way to study!
 
-I suggest you to clone/download the repository. 
 If you open a notebook with Github or NBviewer, sometimes mathematical formulas are not displayed correctly. 
+For this reason, I suggest you to clone/download the repository. 
+
+
+### Is this series of notebooks complete?
+
+**No!**    
+I will upload more notebooks from time to time. 
+
+At the moment, I'm interested in the areas of stochastic processes, Kalman Filter, statistics and much more. I will add more interesting notebooks in the future. 
+
+If you have any kind of questions, or if you find some errors, or you have suggestions for improvements, feel free to contact me.      
+This is my [linkedin](https://www.linkedin.com/in/nicolacantarutti) page.
+
 
 
 ### Contents
@@ -82,11 +98,8 @@ If you open a notebook with Github or NBviewer, sometimes mathematical formulas 
 4.1) **Pricing with transaction costs** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/4.1%20Option%20pricing%20with%20transaction%20costs.ipynb)
 *(Davis-Panas-Zariphopoulou model, singular control problem, HJB variational inequality, indifference pricing, binomial tree, performances)*
 
-5.1) **Linear regression and Kalman filter** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/5.1%20Kalman%20regression.ipynb)
-*(to do)*
-
-5.2) **Kalman filter and Heston model** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/5.2%20Heston%20model%20%28Kalman%29.ipynb)
-*(to do)*
+5.1) **Linear regression and Kalman filter** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/5.1%20Linear%20regression%20-%20Kalman%20filter.ipynb)
+*(market data cleaning, Linear regression methods, Kalman filter design, choice of parameters)*
 
 A.1) **Appendix: Linear equations** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/A.1%20Solution%20of%20linear%20equations.ipynb)
 *(LU, Jacobi, Gauss-Seidel, SOR, Thomas)*
@@ -106,7 +119,7 @@ You have two options:
 1) Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
 
 At this point you can just run the script ```docker_start_notebook.py``` and you are done.     
-This script will download a data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook) that will be used every time you run the script (ONLY the first time, the script will take about 20 minutes to download the image). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
+This script will download a data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook) that will be used every time you run the script (the script will take about 20 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 
 2) Clone the repository and open the notebooks using `jupyter-notebook`. 
 If you are using an old version of python there can be compatibility problems.
