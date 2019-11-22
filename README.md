@@ -12,7 +12,8 @@ This is not a tutorial for beginners.
 This tutorial is for readers with a basic knowledge in stochastic calculus, financial mathematics and statistics. A basic knowledge of python programming is also necessary.
 
 In these notebooks I will not explain what is a call option, or what is a stochastic process, or a partial differential equation.     
-However, every time I introduce a concept, I also add a link to a reference article or to the wiki page. In this way, the reader can immediately understand what I am talking about. 
+However, every time I will introduce a concept, I will also add a link to the corresponding wiki page or to a reference manual.
+In this way, the reader will be able to immediately understand what I am talking about. 
 
 This tutorial is for students in science, economics or finance who have followed at least one undergraduate course in financial mathematics and statistics.       
 Self-taught students or practicioners should have read at least an introductiory books in financial mathematics.
@@ -22,7 +23,7 @@ Self-taught students or practicioners should have read at least an introductiory
 
 Probably no! :) 
 
-This is a collection of topics and algorithms that in my optinion are interesting.     
+This is a collection of topics and algorithms that in my opinion are interesting.     
 
 Lévy processes are not very popular nowadays, but they are very powerful. 
 The Kalman filter is a very powerful tool as well, but it is hard to find examples of financial applications in the web.       

@@ -110,8 +110,8 @@ class Heston_process():
     sigma = volatility coefficient of the variance process
     kappa = mean reversion coefficient for the variance process
     """
-    def __init__(self, r=0.1, rho=0, sigma=0.2, theta=-0.1, kappa=0.1):
-        self.r = r
+    def __init__(self, mu=0.1, rho=0, sigma=0.2, theta=-0.1, kappa=0.1):
+        self.mu = mu
         if (np.abs(rho)>1):
             raise ValueError("|rho| must be <=1")
         self.rho = rho
@@ -121,7 +121,40 @@ class Heston_process():
             self.theta = theta
             self.sigma = sigma
             self.kappa = kappa            
+    
+    def path(self, S0, v0, N, T=1):
+        """
+        Produces one path of the Heston process.
+        N = number of time steps
+        T = Time in years
+        Returns two arrays S (price) and v (variance). 
+        """
+        
+        MU = np.array([0, 0])
+        COV = np.matrix([[1, self.rho], [self.rho, 1]])
+        W = ss.multivariate_normal.rvs( mean=MU, cov=COV, size=N-1 )
+        W_S = W[:,0]                   # Stock Brownian motion:     W_1
+        W_v = W[:,1]                   # Variance Brownian motion:  W_2
 
+        # Initialize vectors
+        T_vec, dt = np.linspace(0,T,N, retstep=True )
+        dt_sq = np.sqrt(dt)
+        
+        X0 = np.log(S0)
+        v = np.zeros(N)
+        v[0] = v0
+        X = np.zeros(N)
+        X[0] = X0
+
+        # Generate paths
+        for t in range(0,N-1):
+            v_sq = np.sqrt(v[t])
+            v[t+1] = np.abs( v[t] + self.kappa*(self.theta - v[t])*dt + self.sigma * v_sq * dt_sq * W_v[t] )   
+            X[t+1] = X[t] + (self.mu - 0.5*v[t])*dt + v_sq * dt_sq * W_S[t]
+        
+        return np.exp(X), v
+    
+    
 
 class NIG_process():
     """
