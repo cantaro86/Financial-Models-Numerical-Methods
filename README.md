@@ -2,7 +2,7 @@ Financial-Models-Numerical-Methods
 ==================================
 
 
-This is a collection of [Jupyter notebooks](https://jupyter.org/) that are based on different topics in the area of quantitative finance.
+This is a collection of [Jupyter notebooks](https://jupyter.org/) based on different topics in the area of quantitative finance.
 
 
 ### Is this a tutorial?
@@ -18,7 +18,7 @@ The aim of these notebooks is to present these interesting topics, by showing th
 
 ### Who are these notebooks for?
 
-Not for beginners. 
+Not for absolute beginners. 
 
 These topics require a basic knowledge in stochastic calculus, financial mathematics and statistics. A basic knowledge of python programming is also necessary.
 
@@ -54,7 +54,7 @@ For this reason, I suggest you to clone/download the repository.
 **No!**    
 I will upload more notebooks from time to time. 
 
-At the moment, I'm interested in the areas of stochastic processes, Kalman Filter, statistics and much more. I will add more interesting notebooks in the future. 
+At the moment, I'm interested in the areas of stochastic processes, Kalman Filter, statistics and much more. I will add more interesting notebooks on these topics in the future. 
 
 If you have any kind of questions, or if you find some errors, or you have suggestions for improvements, feel free to contact me.      
 This is my [linkedin](https://www.linkedin.com/in/nicolacantarutti) page.
@@ -118,16 +118,17 @@ You have two options:
 
 1) Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
 
-At this point you can just run the script ```docker_start_notebook.py``` and you are done.     
-This script will download a data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook) that will be used every time you run the script (the script will take about 20 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
+At this point, you just need to run the script ```docker_start_notebook.py``` and you are done.     
+This script will download the data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook), that will be used every time you run the script (the script will take about 10-15 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 
 2) Clone the repository and open the notebooks using `jupyter-notebook`. 
 If you are using an old version of python there can be compatibility problems.
 
+```diff
+- Cython code needs to be compiled!
+```
 
-###### The cython code needs to be compiled!
-
-If you are using the data science image, you can open the shell inside the notebooks folder and run the script 
+If you are using the data science image, you can open the shell in the notebooks directory, and run the script 
 ```bash
 python docker_start_notebook.py
 ```
@@ -142,7 +143,7 @@ exit
 ``` 
 (`Numeric_Finance` is the name of the docker container)
 
-If you are using jupyter-notebook just copy in the shell:
+If you are not using docker, just copy in the shell the following:
 
 ```bash 
 cd functions/cython
