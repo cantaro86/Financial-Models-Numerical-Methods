@@ -45,7 +45,7 @@ I think that beginners in quantitative finance will find these notebooks very us
 Moreover, Jupyter notebooks are interactive i.e. you can run the code inside the notebook. 
 This is probably the best way to study!
 
-If you open a notebook with Github or NBviewer, sometimes mathematical formulas are not displayed correctly. 
+If you open a notebook with Github or [NBviewer](https://nbviewer.ipython.org), sometimes mathematical formulas are not displayed correctly. 
 For this reason, I suggest you to clone/download the repository. 
 
 
@@ -63,51 +63,52 @@ This is my [linkedin](https://www.linkedin.com/in/nicolacantarutti) page.
 
 ### Contents
 
-1.1) **Black-Scholes numerical methods** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/1.1%20Black-Scholes%20numerical%20methods.ipynb) *(lognormal distribution, change of measure, Monte Carlo, Binomial method)*.
+1.1) **Black-Scholes numerical methods**
+*(lognormal distribution, change of measure, Monte Carlo, Binomial method)*.
 
-1.2) **SDE simulation and statistics** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/1.2%20SDE%20simulations%20and%20statistics.ipynb)
+1.2) **SDE simulation and statistics**
 *(paths generation, Confidence intervals, Hypothesys testing, Geometric Brownian motion, Cox-Ingersoll-Ross process, Euler Maruyama method, parameters estimation)*
 
-1.3) **Fourier inversion methods** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/1.3%20Fourier%20transform%20methods.ipynb)
+1.3) **Fourier inversion methods**
 *(derivation of inversion formula, numerical inversion, option pricing)*
 
-1.4) **SDE, Heston model** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/1.4%20SDE%20-%20Heston%20model.ipynb)
+1.4) **SDE, Heston model**
 *(correlated Brownian motions, Heston paths, Heston distribution, characteristic function, option pricing)*
 
-1.5) **SDE, Lévy processes** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/1.5%20SDE%20-%20L%C3%A9vy%20processes.ipynb)
+1.5) **SDE, Lévy processes** 
 *(Merton, Variance Gamma, NIG, path generation, parameter estimation)*
 
-2.1) **The Black-Scholes PDE** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/2.1%20Black-Scholes%20PDE%20and%20sparse%20matrices.ipynb)
+2.1) **The Black-Scholes PDE** 
 *(PDE discretization, Implicit method, sparse matrix tutorial)*
 
-2.2) **Exotic options** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/2.2%20Exotic%20options.ipynb)
+2.2) **Exotic options**
 *(Binary options, Barrier options)*
 
-2.3) **American options** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/2.3%20American%20Options.ipynb)
+2.3) **American options**
 *(PDE, Binomial method, Longstaff-Schwartz)*
 
-3.1) **Merton Jump-Diffusion PIDE** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/3.1%20Merton%20jump-diffusion%2C%20PIDE%20method.ipynb)
+3.1) **Merton Jump-Diffusion PIDE**
 *(Implicit-Explicit discretization, discrete convolution, model limitations, Monte Carlo, Fourier inversion, semi-closed formula )*
 
-3.2) **Variance Gamma PIDE** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/3.2%20Variance%20Gamma%20model%2C%20PIDE%20method.ipynb)
+3.2) **Variance Gamma PIDE**
 *(approximated jump-diffusion PIDE, Monte Carlo, Fourier inversion, Comparison with Black-Scholes)*
 
-3.3) **Normal Inverse Gaussian PIDE** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/3.3%20Pricing%20with%20the%20NIG%20Process.ipynb)
+3.3) **Normal Inverse Gaussian PIDE** 
 *(approximated jump-diffusion PIDE, Monte Carlo, Fourier inversion, properties of the Lévy measure)*
 
-4.1) **Pricing with transaction costs** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/4.1%20Option%20pricing%20with%20transaction%20costs.ipynb)
+4.1) **Pricing with transaction costs** 
 *(Davis-Panas-Zariphopoulou model, singular control problem, HJB variational inequality, indifference pricing, binomial tree, performances)*
 
-5.1) **Linear regression and Kalman filter** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/5.1%20Linear%20regression%20-%20Kalman%20filter.ipynb)
+5.1) **Linear regression and Kalman filter** 
 *(market data cleaning, Linear regression methods, Kalman filter design, choice of parameters)*
 
-A.1) **Appendix: Linear equations** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/A.1%20Solution%20of%20linear%20equations.ipynb)
+A.1) **Appendix: Linear equations** 
 *(LU, Jacobi, Gauss-Seidel, SOR, Thomas)*
   
-A.2) **Appendix: Code optimization** [nbviewer](https://nbviewer.ipython.org/github/cantaro86/Financial-Models-Numerical-Methods/blob/master/A.2%20Optimize%20and%20speed%20up%20the%20code.%20%28SOR%20algorithm%2C%20Cython%20and%20C%29.ipynb)
+A.2) **Appendix: Code optimization** 
 *(cython, C code)*
 
-A.3) **Appendix: Review of Lévy processes theory** [github](https://github.com/cantaro86/Financial-Models-Numerical-Methods/blob/master/A.3%20Introduction%20to%20L%C3%A9vy%20processes%20and%20PIDEs.pdf)
+A.3) **Appendix: Review of Lévy processes theory**
 *(basic and important definitions, derivation of the pricing PIDE)*
 
 
