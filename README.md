@@ -27,7 +27,7 @@ However, every time I will introduce a concept, I will also add a link to the co
 In this way, the reader will be able to immediately understand what I am talking about. 
 
 These notes are for students in science, economics or finance who have followed at least one undergraduate course in financial mathematics and statistics.       
-Self-taught students or practicioners should have read at least an introductiory books in financial mathematics.
+Self-taught students or practicioners should have read at least an introductiory book on financial mathematics. 
 
 
 ### Why is it worth to read these notes?  
