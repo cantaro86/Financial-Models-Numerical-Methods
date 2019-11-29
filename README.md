@@ -57,7 +57,6 @@ I will upload more notebooks from time to time.
 At the moment, I'm interested in the areas of stochastic processes, Kalman Filter, statistics and much more. I will add more interesting notebooks on these topics in the future. 
 
 If you have any kind of questions, or if you find some errors, or you have suggestions for improvements, feel free to contact me.      
-This is my [linkedin](https://www.linkedin.com/in/nicolacantarutti) page.
 
 
 
