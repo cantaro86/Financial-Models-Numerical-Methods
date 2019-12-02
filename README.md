@@ -36,7 +36,7 @@ First of all, this is not a book!
 Every notebook is (almost) independent from the others. Therefore you can select only the notebook you are interested in!
 
 ```diff
-- Every notebook, contains python code ready to use!     
+- Every notebook contains python code ready to use!     
 ```
 
 It is not easy to find on internet examples of financial models implemented in python which are ready to use and well documented.    
@@ -118,8 +118,13 @@ You have several options:
 
 1) **Docker:** Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
 
-At this point, you just need to run the script ```docker_start_notebook.py``` and you are done.     
-This script will download the data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook), that will be used every time you run the script (the script will take about 10-15 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
+At this point, you just need to run the script `docker_start_notebook.py`, i.e enter in the shell the following code:
+
+```bash
+python docker_start_notebook.py
+```
+
+The script will download the data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook), that will be used every time you run the script (the script will take about 10-15 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 
 2) **Virtual environment:**
 Here I explain how to create a virtual environment with [Anaconda](https://www.anaconda.com/distribution/). A possible alternative could be to use the python module [venv](https://docs.python.org/3.7/tutorial/venv.html). 
@@ -130,8 +135,13 @@ source activate FMNM
 pip install --requirement requirements.txt
 ```
 
-3) If you prefer to use the python version already installed in your system, you just need to enter `jupyter-notebook` in the shell. 
-However, if you are using an old version, there could be compatibility problems.
+3) If you prefer to use the python version already installed in your system, you just need to check that all the packages listed in `requirements.txt` are installed, and then enter in the shell the code:
+
+```bash
+jupyter-notebook
+```
+
+However, if you are using old versions, there could be compatibility problems.
 
 
 #### If you wish to use a different python version or a different docker image, you will probably need to recompile the Cython code!
@@ -141,7 +151,7 @@ If you are using the data science image, you can open the shell in the notebooks
 python docker_start_notebook.py
 ```
 
-after that, copy-paste the following code into the shell:
+after that, paste the following code into the shell:
 
 ```bash 
 docker exec -it Numeric_Finance bash
