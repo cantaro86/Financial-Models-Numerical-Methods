@@ -114,19 +114,27 @@ A.3) **Appendix: Review of Lévy processes theory**
 
 ## How to run the notebooks 
 
-You have two options:
+You have several options:
 
-1) Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
+1) **Docker:** Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
 
 At this point, you just need to run the script ```docker_start_notebook.py``` and you are done.     
 This script will download the data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook), that will be used every time you run the script (the script will take about 10-15 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 
-2) Clone the repository and open the notebooks using `jupyter-notebook`. 
-If you are using an old version of python there can be compatibility problems.
+2) **Virtual environment:**
+Here I explain how to create a virtual environment with [Anaconda](https://www.anaconda.com/distribution/). A possible alternative could be to use the python module [venv](https://docs.python.org/3.7/tutorial/venv.html). 
 
-```diff
-- Cython code needs to be compiled!
+```bash
+conda create -n FMNM python=3.7.3
+source activate FMNM
+pip install --requirement requirements.txt
 ```
+
+3) If you prefer to use the python version already installed in your system, you just need to enter `jupyter-notebook` in the shell. 
+However, if you are using an old version, there could be compatibility problems.
+
+
+#### If you wish to use a different python version or a different docker image, you will probably need to recompile the Cython code!
 
 If you are using the data science image, you can open the shell in the notebooks directory, and run the script 
 ```bash
