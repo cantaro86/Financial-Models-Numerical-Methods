@@ -101,6 +101,9 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 5.1) **Linear regression and Kalman filter** 
 *(market data cleaning, Linear regression methods, Kalman filter design, choice of parameters)*
 
+5.2) **Kalman auto-correlation tracking - AR(1) process** 
+*(Autoregressive process, estimation methods, Kalman filter, Kalman smoother, variable autocorrelation tracking)*
+
 A.1) **Appendix: Linear equations** 
 *(LU, Jacobi, Gauss-Seidel, SOR, Thomas)*
   
