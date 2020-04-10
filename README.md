@@ -104,6 +104,9 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 5.2) **Kalman auto-correlation tracking - AR(1) process** 
 *(Autoregressive process, estimation methods, Kalman filter, Kalman smoother, variable autocorrelation tracking)*
 
+5.3) **Volatility tracking** 
+*(Heston simulation, hypothesis testing, distribution fitting, estimation methods, GARCH(1,1), Kalman filter, Kalman smoother)*
+
 A.1) **Appendix: Linear equations** 
 *(LU, Jacobi, Gauss-Seidel, SOR, Thomas)*
   
