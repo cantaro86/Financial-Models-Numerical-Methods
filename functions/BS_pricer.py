@@ -24,6 +24,7 @@ from functools import partial
 
 
 
+
 class BS_pricer():
     """
     Closed Formula.
@@ -319,4 +320,4 @@ class BS_pricer():
     
         V0 = np.mean(V[:,1]) * df  # 
         return V0
-        
+
