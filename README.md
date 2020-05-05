@@ -81,7 +81,7 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 *(PDE discretization, Implicit method, sparse matrix tutorial)*
 
 2.2) **Exotic options**
-*(Binary options, Barrier options)*
+*(Binary options, Barrier options, Asian options)*
 
 2.3) **American options**
 *(PDE, Binomial method, Longstaff-Schwartz)*
