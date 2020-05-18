@@ -22,6 +22,7 @@ from matplotlib import cm
 from functions.CF import cf_VG
 from functions.probabilities import Q1, Q2
 from functools import partial
+from functions.FFT import fft_Lewis
 
 
 class VG_pricer():
@@ -44,6 +45,7 @@ class VG_pricer():
         self.theta = Process_info.theta       # VG parameter
         self.kappa = Process_info.kappa       # VG parameter
         self.exp_RV = Process_info.exp_RV     # function to generate exponential VG Random Variables
+        self.w = -np.log(1 - self.theta * self.kappa - self.kappa/2 * self.sigma**2 ) /self.kappa    # coefficient w
         
         self.S0 = Option_info.S0          # current price
         self.K = Option_info.K            # strike
@@ -104,10 +106,9 @@ class VG_pricer():
         Price obtained by inversion of the characteristic function
         """
         k = np.log(self.K/self.S0)                # log moneyness
-        w = -np.log(1 - self.theta * self.kappa - self.kappa/2 * self.sigma**2 ) /self.kappa    # coefficient w
-        cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-w), theta=self.theta, sigma=self.sigma, kappa=self.kappa ) 
+        cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-self.w), theta=self.theta, sigma=self.sigma, kappa=self.kappa ) 
         
-        right_lim = 5000         # using np.inf may create warnings 
+        right_lim = 200         # using np.inf may create warnings 
         if self.payoff == "call":
             call = self.S0 * Q1(k, cf_VG_b, right_lim) - self.K * np.exp(-self.r*self.T) * Q2(k, cf_VG_b, right_lim)   # pricing function
             return call
@@ -143,6 +144,21 @@ class VG_pricer():
             else:
                 return V        
     
+
+    def FFT(self, K):
+        """
+        FFT method. It returns a vector of prices.
+        K is an array of strikes
+        """
+        cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-self.w), theta=self.theta, sigma=self.sigma, kappa=self.kappa )
+        
+        if self.payoff == "call":
+            return fft_Lewis(K, self.S0, self.r, self.T, cf_VG_b, interp="cubic")
+        elif self.payoff == "put":
+            raise NotImplementedError
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+
     
     
     def PIDE_price(self, steps, Time=False):
