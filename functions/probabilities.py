@@ -22,7 +22,7 @@ def Q1(k, cf, right_lim):
     """
     integrand = lambda u: np.real( (np.exp(-u*k*1j) / (u*1j)) * 
                                   cf(u-1j) / cf(-1.0000000000001j) )  
-    return 1/2 + 1/np.pi * quad(integrand, 1e-15, right_lim, limit=1000 )[0]
+    return 1/2 + 1/np.pi * quad(integrand, 1e-15, right_lim, limit=2000 )[0]
 
 
 def Q2(k, cf, right_lim):
@@ -32,7 +32,7 @@ def Q2(k, cf, right_lim):
     right_lim: right limit of integration
     """
     integrand = lambda u: np.real( np.exp(-u*k*1j) /(u*1j) * cf(u) )
-    return 1/2 + 1/np.pi * quad(integrand, 1e-15, right_lim, limit=1000 )[0]
+    return 1/2 + 1/np.pi * quad(integrand, 1e-15, right_lim, limit=2000 )[0]
 
 
 def Gil_Pelaez_pdf(x, cf, right_lim):

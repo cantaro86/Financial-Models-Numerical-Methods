@@ -22,7 +22,7 @@ from matplotlib import cm
 from functions.CF import cf_VG
 from functions.probabilities import Q1, Q2
 from functools import partial
-from functions.FFT import fft_Lewis
+from functions.FFT import fft_Lewis, IV_from_Lewis
 
 
 class VG_pricer():
@@ -108,7 +108,7 @@ class VG_pricer():
         k = np.log(self.K/self.S0)                # log moneyness
         cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-self.w), theta=self.theta, sigma=self.sigma, kappa=self.kappa ) 
         
-        right_lim = 200         # using np.inf may create warnings 
+        right_lim = 5000         # using np.inf may create warnings 
         if self.payoff == "call":
             call = self.S0 * Q1(k, cf_VG_b, right_lim) - self.K * np.exp(-self.r*self.T) * Q2(k, cf_VG_b, right_lim)   # pricing function
             return call
@@ -129,7 +129,7 @@ class VG_pricer():
         t_init = time()
              
         S_T = self.exp_RV( self.S0, self.T, N )
-        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T) )
+        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T), axis=0 )
         
         if (Err == True):
             if (Time == True):
@@ -150,16 +150,31 @@ class VG_pricer():
         FFT method. It returns a vector of prices.
         K is an array of strikes
         """
+        K = np.array(K)
         cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-self.w), theta=self.theta, sigma=self.sigma, kappa=self.kappa )
         
         if self.payoff == "call":
             return fft_Lewis(K, self.S0, self.r, self.T, cf_VG_b, interp="cubic")
+        elif self.payoff == "put":   # put-call parity
+            return fft_Lewis(K, self.S0, self.r, self.T, cf_VG_b, interp="cubic") - self.S0 + K*np.exp(-self.r*self.T)
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+            
+            
+    
+    def IV_Lewis(self):
+        """ Implied Volatility from the Lewis formula """
+    
+        cf_VG_b = partial(cf_VG, t=self.T, mu=(self.r-self.w), theta=self.theta, sigma=self.sigma, kappa=self.kappa )
+        
+        if self.payoff == "call":
+            return IV_from_Lewis(self.K, self.S0, self.T, self.r, cf_VG_b)
         elif self.payoff == "put":
             raise NotImplementedError
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
 
-    
+
     
     def PIDE_price(self, steps, Time=False):
         """

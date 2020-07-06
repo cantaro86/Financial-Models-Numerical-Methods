@@ -15,7 +15,7 @@ from functions.CF import cf_Heston_good
 from functions.cython.cython_Heston import Heston_paths
 from functions.probabilities import Q1, Q2
 from functools import partial
-from functions.FFT import fft_Lewis
+from functions.FFT import fft_Lewis, IV_from_Lewis
 
 
 
@@ -67,8 +67,9 @@ class Heston_pricer():
              
         S_T, _ = Heston_paths(N=N, paths=paths, T=self.T, S0=self.S0, v0=self.v0, mu=self.r, rho=self.rho, 
                             kappa=self.kappa, theta=self.theta, sigma=self.sigma  )
+        S_T = S_T.reshape( (paths,1) )
         DiscountedPayoff = np.exp(-self.r*self.T) * self.payoff_f(S_T) 
-        V = scp.mean( DiscountedPayoff )
+        V = scp.mean( DiscountedPayoff, axis=0 )
         std_err = ss.sem( DiscountedPayoff )
         
         if (Err == True):
@@ -94,7 +95,7 @@ class Heston_pricer():
         cf_H_b_good = partial(cf_Heston_good, t=self.T, v0=self.v0, mu=self.r, theta=self.theta, 
                                   sigma=self.sigma, kappa=self.kappa, rho=self.rho ) 
         
-        limit_max = 1000      # right limit in the integration                
+        limit_max = 2000      # right limit in the integration                
         
         if self.payoff == "call":
             call = self.S0 * Q1(k, cf_H_b_good, limit_max) \
@@ -113,11 +114,25 @@ class Heston_pricer():
         FFT method. It returns a vector of prices.
         K is an array of strikes
         """
+        K = np.array(K)
         cf_H_b_good = partial(cf_Heston_good, t=self.T, v0=self.v0, mu=self.r, theta=self.theta, 
                                   sigma=self.sigma, kappa=self.kappa, rho=self.rho ) 
         
         if self.payoff == "call":
             return fft_Lewis(K, self.S0, self.r, self.T, cf_H_b_good, interp="cubic")
+        elif self.payoff == "put":        # put-call parity
+            return fft_Lewis(K, self.S0, self.r, self.T, cf_H_b_good, interp="cubic") - self.S0 + K*np.exp(-self.r*self.T)
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+            
+
+    def IV_Lewis(self):
+        """ Implied Volatility from the Lewis formula """
+    
+        cf_H_b_good = partial(cf_Heston_good, t=self.T, v0=self.v0, mu=self.r, theta=self.theta, 
+                                  sigma=self.sigma, kappa=self.kappa, rho=self.rho )
+        if self.payoff == "call":
+            return IV_from_Lewis(self.K, self.S0, self.T, self.r, cf_H_b_good)
         elif self.payoff == "put":
             raise NotImplementedError
         else:

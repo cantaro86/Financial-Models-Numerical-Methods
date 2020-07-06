@@ -21,6 +21,7 @@ from functions.cython.cython_functions import SOR
 from functions.CF import cf_normal
 from functions.probabilities import Q1, Q2
 from functools import partial
+from functions.FFT import fft_Lewis, IV_from_Lewis
 
 
 
@@ -82,6 +83,13 @@ class BS_pricer():
             raise ValueError("invalid type. Set 'call' or 'put'")
     
     
+    @staticmethod        
+    def vega(sigma, S0, K, T, r):
+        """ BS vega: derivative of the price with respect to the volatility """
+        d1 = (np.log(S0/K) + (r + sigma**2 / 2) * T) / (sigma * np.sqrt(T))
+        return S0 * np.sqrt(T) * ss.norm.pdf(d1)
+    
+    
     def closed_formula(self):
         """ 
         Black Scholes closed formula:
@@ -114,8 +122,34 @@ class BS_pricer():
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
             
+     
+    def FFT(self, K):
+        """
+        FFT method. It returns a vector of prices.
+        K is an array of strikes
+        """
+        K = np.array(K)
+        cf_GBM = partial(cf_normal, mu=( self.r - 0.5 * self.sig**2 )*self.T, sig=self.sig*np.sqrt(self.T))  # function binding
+        if self.payoff == "call":
+            return fft_Lewis(K, self.S0, self.r, self.T, cf_GBM, interp="cubic")
+        elif self.payoff == "put":    # put-call parity
+            return fft_Lewis(K, self.S0, self.r, self.T, cf_GBM, interp="cubic") - self.S0 + K*np.exp(-self.r*self.T)
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
             
+            
+    def IV_Lewis(self):
+        """ Implied Volatility from the Lewis formula """
     
+        cf_GBM = partial(cf_normal, mu=( self.r - 0.5 * self.sig**2 )*self.T, sig=self.sig*np.sqrt(self.T))  # function binding
+        if self.payoff == "call":
+            return IV_from_Lewis(self.K, self.S0, self.T, self.r, cf_GBM)
+        elif self.payoff == "put":
+            raise NotImplementedError
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+    
+        
     def MC(self, N, Err=False, Time=False):
         """
         BS Monte Carlo
@@ -125,7 +159,8 @@ class BS_pricer():
         t_init = time()
              
         S_T = self.exp_RV( self.S0, self.T, N )
-        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T) )
+        PayOff = self.payoff_f(S_T)
+        V = scp.mean( np.exp(-self.r*self.T) * PayOff, axis=0  )
         
         if (Err == True):
             if (Time == True):

@@ -21,6 +21,7 @@ from math import factorial
 from functions.CF import cf_mert
 from functions.probabilities import Q1, Q2
 from functools import partial
+from functions.FFT import fft_Lewis, IV_from_Lewis
 
 
 class Merton_pricer():
@@ -101,7 +102,38 @@ class Merton_pricer():
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
 
+    
+    def FFT(self, K):
+        """
+        FFT method. It returns a vector of prices.
+        K is an array of strikes
+        """
+        K = np.array(K)
+        m = self.lam * (np.exp(self.muJ + (self.sigJ**2)/2) -1)    # coefficient m
+        cf_Mert = partial(cf_mert, t=self.T, mu=( self.r - 0.5 * self.sig**2 -m ), sig=self.sig, lam=self.lam, muJ=self.muJ, sigJ=self.sigJ )
+        
+        if self.payoff == "call":
+            return fft_Lewis(K, self.S0, self.r, self.T, cf_Mert, interp="cubic")
+        elif self.payoff == "put":      # put-call parity
+            return fft_Lewis(K, self.S0, self.r, self.T, cf_Mert, interp="cubic") - self.S0 + K*np.exp(-self.r*self.T)
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
+            
+            
+    def IV_Lewis(self):
+        """ Implied Volatility from the Lewis formula """
+    
+        m = self.lam * (np.exp(self.muJ + (self.sigJ**2)/2) -1)    # coefficient m
+        cf_Mert = partial(cf_mert, t=self.T, mu=( self.r - 0.5 * self.sig**2 -m ), sig=self.sig, lam=self.lam, muJ=self.muJ, sigJ=self.sigJ )
+        
+        if self.payoff == "call":
+            return IV_from_Lewis(self.K, self.S0, self.T, self.r, cf_Mert)
+        elif self.payoff == "put":
+            raise NotImplementedError
+        else:
+            raise ValueError("invalid type. Set 'call' or 'put'")
 
+    
     
     def MC(self, N, Err=False, Time=False):
         """
@@ -112,7 +144,7 @@ class Merton_pricer():
         t_init = time()
              
         S_T = self.exp_RV( self.S0, self.T, N )
-        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T) )
+        V = scp.mean( np.exp(-self.r*self.T) * self.payoff_f(S_T), axis=0 )
         
         if (Err == True):
             if (Time == True):

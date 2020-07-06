@@ -30,9 +30,9 @@ class Diffusion_process():
             self.sig = sig
 
     def exp_RV(self, S0, T, N):
-        W = ss.norm.rvs( (self.r-0.5*self.sig**2)*T , np.sqrt(T)*self.sig, N)
+        W = ss.norm.rvs( (self.r-0.5*self.sig**2)*T , np.sqrt(T)*self.sig, N )
         S_T = S0 * np.exp(W)
-        return S_T
+        return S_T.reshape((N,1))
 
 
 
@@ -66,7 +66,7 @@ class Merton_process():
         P = ss.poisson.rvs(self.lam*T, size=N)    # Poisson random vector (number of jumps)
         Jumps = np.asarray([ss.norm.rvs(self.muJ, self.sigJ, ind).sum() for ind in P ]) # Jumps vector
         S_T = S0 * np.exp( (self.r - 0.5*self.sig**2 -m )*T + np.sqrt(T)*self.sig*W + Jumps )     # Martingale exponential Merton
-        return S_T
+        return S_T.reshape((N,1))
  
 
        
@@ -103,7 +103,7 @@ class VG_process():
         Norm = ss.norm.rvs(0,1,N)              # The normal RV  
         VG = self.theta * G + self.sigma * np.sqrt(G) * Norm     # VG process at final time G
         S_T = S0 * np.exp( (self.r-w)*T + VG )                 # Martingale exponential VG       
-        return S_T
+        return S_T.reshape((N,1))
     
     def path(self, T=1, N=10000, paths=1):
         """
@@ -242,7 +242,7 @@ class NIG_process():
         Norm = ss.norm.rvs(0,1,N)                                # The normal RV  
         X = self.theta * IG + self.sigma * np.sqrt(IG) * Norm    # NIG random vector
         S_T = S0 * np.exp( (self.r-w)*T + X )                    # exponential dynamics        
-        return S_T
+        return S_T.reshape((N,1))
 
 
 

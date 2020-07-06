@@ -69,7 +69,7 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 *(paths generation, Confidence intervals, Hypothesys testing, Geometric Brownian motion, Cox-Ingersoll-Ross process, Euler Maruyama method, parameters estimation)*
 
 1.3) **Fourier inversion methods**
-*(derivation of inversion formula, numerical inversion, option pricing)*
+*(inversion formula, numerical inversion, option pricing, FFT, Lewis formula)*
 
 1.4) **SDE, Heston model**
 *(correlated Brownian motions, Heston paths, Heston distribution, characteristic function, option pricing)*
@@ -97,6 +97,9 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 
 4.1) **Pricing with transaction costs** 
 *(Davis-Panas-Zariphopoulou model, singular control problem, HJB variational inequality, indifference pricing, binomial tree, performances)*
+
+4.2) **Volatility smile and model calibration**
+*(Volatility smile, root finder methods, calibration methods)*
 
 5.1) **Linear regression and Kalman filter** 
 *(market data cleaning, Linear regression methods, Kalman filter design, choice of parameters)*
