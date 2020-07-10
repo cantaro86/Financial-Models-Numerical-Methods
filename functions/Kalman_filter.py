@@ -13,116 +13,211 @@ import scipy.stats as ss
 import matplotlib.pyplot as plt
 
 
-def Kalman_beta(X, Y, alpha, beta0, var_eta, var_eps, P0 = 10, likelihood=False, Rsq=False):
+class Kalman_regression():
     """ Kalman Filter algorithm for the linear regression beta estimation. Alpha is assumed constant. 
     
     INPUT:
     X = predictor variable. ndarray, Series or DataFrame. 
     Y = response variable.
-    alpha = constant alpha. The regression intercept.
+    alpha0 = constant alpha. The regression intercept.
     beta0 = initial beta. 
     var_eta = variance of process error
     var_eps = variance of measurement error
     P0 = initial covariance of beta
-    likelihood = boolean
-    Rsq = boolean   
-    
-    OUTPUT:
-    If likelihood is false, it returns a list of betas and a list of variances P. 
-    If likelihood is true, it returns the log-likelihood and the last values of beta and P.
-    If Rsq is True, it returns the R squared
     """
     
-    # it checks only X. 
-    if  ( (not isinstance(X, np.ndarray)) and (not isinstance(X, pd.core.frame.DataFrame))
-                        and (not isinstance(X, pd.core.series.Series)) ):
-        raise ValueError("invalid type.")
- 
-    if ( isinstance(X, pd.core.series.Series) or isinstance(X, pd.core.frame.DataFrame) ):
-        X = X.values
-        Y = Y.values
-    
-    N = len(X)
-    assert len(Y) == N
-    
-    betas = np.zeros_like(X)
-    Ps = np.zeros_like(X)
+    def __init__(self, X, Y, alpha0=None, beta0=None, var_eta=None, var_eps=None, P0 = 10):
+        self.alpha0 = alpha0
+        self.beta0 = beta0
+        self.var_eta = var_eta
+        self.var_eps = var_eps
+        self.P0 = P0
+        self.X = np.asarray(X)
+        self.Y = np.asarray(Y)
+        self.loglikelihood = None
+        self.R2_pre_fit = None
+        self.R2_post_fit = None
         
-    Y = Y - alpha         # re-define Y
-    P = P0
-    beta = beta0
-    log_2pi = np.log(2 * np.pi)
-    loglikelihood = 0
+        self.betas = None
+        self.Ps = None
+        
+        if self.alpha0==None or self.beta0==None or self.var_eps==None:
+            self.alpha0, self.beta0, self.var_eps = self.get_OLS_params()
+            print("alpha0, beta0 and var_eps initialized by OLS")
+            
+####################  enforce X and Y to be numpy arrays ######################    
+#    @property
+#    def X(self):
+#        return self._X
+#    @X.setter
+#    def X(self, value):
+#        if not isinstance(value, np.ndarray):
+#            raise TypeError('X must be a numpy array')
+#        self._X = value
+#    
+#    @property
+#    def Y(self):
+#        return self._Y
+#    @Y.setter
+#    def Y(self, value):
+#        if not isinstance(value, np.ndarray):
+#            raise TypeError('Y must be a numpy array')
+#        self._Y = value
+###############################################################################    
     
+    def get_OLS_params(self):
+        """ Returns the OLS alpha, beta and sigma^2 (variance of epsilon)
+            Y = alpha + beta * X + epsilon
+        """
+        beta, alpha, _ ,_ ,_  = ss.linregress(self.X, self.Y)
+        resid = self.Y - beta * self.X - alpha
+        sig2 = resid.var(ddof=2)
+        return alpha, beta, sig2
     
-    for k in range(N):
-        # Prediction
-        beta_p = beta                  # predicted beta 
-        P_p = P + var_eta              # predicted P
+    def set_OLS_params(self):
+        self.alpha0, self.beta0, self.var_eps = self.get_OLS_params()
+        
+    
+    def run(self, X=None, Y=None, var_eta=None, var_eps=None):
+        """ 
+            Run the Kalman Filter
+        """
+        
+        if (X is None) and (Y is None):
+            X = self.X
+            Y = self.Y
+        
+        X = np.asarray(X)
+        Y = np.asarray(Y)
+        
+        N = len(X)
+        if len(Y) != N:
+            raise ValueError("Y and X must have same length") 
+    
+        if var_eta is not None:
+            self.var_eta = var_eta
+        if var_eps is not None:
+            self.var_eps = var_eps
+        if self.var_eta==None:
+            raise ValueError("var_eta is None")
+        
+        betas = np.zeros_like(X)
+        Ps = np.zeros_like(X)
+        res_pre = np.zeros_like(X)       # pre-fit residuals
+        
+        Y = Y - self.alpha0              # re-define Y
+        P = self.P0
+        beta = self.beta0
+        
+        log_2pi = np.log(2 * np.pi)
+        loglikelihood = 0
+    
+        for k in range(N):
+            # Prediction
+            beta_p = beta                  # predicted beta 
+            P_p = P + self.var_eta              # predicted P
 
-        # ausiliary variables
-        r = Y[k] - beta_p * X[k]
-        S = P_p * X[k]**2 + var_eps
-        KG = X[k] * P_p / S            # Kalman gain
+            # ausiliary variables
+            r = Y[k] - beta_p * X[k]
+            S = P_p * X[k]**2 + self.var_eps
+            KG = X[k] * P_p / S            # Kalman gain
         
-        # Update
-        beta = beta_p + KG * r
-        P = P_p * (1 - KG * X[k])
+            # Update
+            beta = beta_p + KG * r
+            P = P_p * (1 - KG * X[k])
 
-        loglikelihood += 0.5 * ( -log_2pi - np.log(S) - (r**2/S) )      
+            loglikelihood += 0.5 * ( -log_2pi - np.log(S) - (r**2/S) )      
         
-        if likelihood == False:
             betas[k] = beta
             Ps[k] = P
-    
-    beta_last = beta
-    P_last = P
-    
-    if likelihood == False and Rsq == False:
-        return betas, Ps
-    elif (likelihood == True and Rsq == False):
-        return loglikelihood, beta_last, P_last
-    else:
-        res = Y - X * betas   # post fit residuals 
+            res_pre[k] = r
+            
+        res_post = Y - X * betas   # post fit residuals 
         sqr_err = Y - np.mean(Y)                             
-        R2 = 1 - ( res @ res )/(sqr_err @ sqr_err)
-        return R2
-
-
-
-def calibrate_Kalman_MLE(X, Y, alpha_tr, beta_tr, var_eps_ols):
-    """ Returns the result of the MLE calibration for the Beta Kalman filter, using the L-BFGS-B method. 
-    The calibrated parameters are var_eta and var_eps. 
-    X, Y          = Series, array, or DataFrame for the regression 
-    alpha_tr      = initial alpha 
-    beta_tr       = initial beta 
-    var_eps_ols   = initial guess for the errors
-    """
-
-    def minus_likelihood(c):
-        """ Function to minimize in order to calibrate the kalman parameters: var_eta and var_eps. """
-        loglik, _, _ = Kalman_beta(X, Y, alpha_tr, beta_tr, c[0], c[1], 1, True)
-        return -loglik
+        R2_pre = 1 - ( res_pre @ res_pre )/(sqr_err @ sqr_err)
+        R2_post = 1 - ( res_post @ res_post )/(sqr_err @ sqr_err)
         
-    result = minimize(minus_likelihood, x0=[var_eps_ols,var_eps_ols], 
-                      method='L-BFGS-B', bounds=[[1e-15,None],[1e-15,None]], tol=1e-8)
-    return result
-
-
-
-def calibrate_Kalman_R2(X, Y, alpha_tr, beta_tr, var_eps_ols):
-    """ Returns the result of the R2 calibration for the Beta Kalman filter, using the L-BFGS-B method. 
-    The calibrated parameters is var_eta
-    """
-
-    def minus_R2(c):
-        """ Function to minimize in order to calibrate the kalman parameters: var_eta and var_eps. """
-        R2 = Kalman_beta(X, Y, alpha_tr, beta_tr, c, var_eps_ols, 1, False, True)
-        return -R2
+        self.loglikelihood = loglikelihood
+        self.R2_post_fit = R2_post
+        self.R2_pre_fit = R2_pre
         
-    result = minimize(minus_R2, x0=[var_eps_ols], 
-                      method='L-BFGS-B', bounds=[[1e-15,1]], tol=1e-8)
-    return result
+        self.betas = betas 
+        self.Ps = Ps
+        
+
+
+    def calibrate_MLE(self):
+        """ Returns the result of the MLE calibration for the Beta Kalman filter, using the L-BFGS-B method. 
+        The calibrated parameters are var_eta and var_eps. 
+        X, Y          = Series, array, or DataFrame for the regression 
+        alpha_tr      = initial alpha 
+        beta_tr       = initial beta 
+        var_eps_ols   = initial guess for the errors
+        """
+
+        def minus_likelihood(c):
+            """ Function to minimize in order to calibrate the kalman parameters: var_eta and var_eps. """
+            self.var_eps = c[0]
+            self.var_eta = c[1]
+            self.run()
+            return -1 * self.loglikelihood
+        
+        result = minimize(minus_likelihood, x0=[self.var_eps, self.var_eps], 
+                          method='L-BFGS-B', bounds=[[1e-15,None],[1e-15,None]], tol=1e-6)
+        
+        if result.success == True:
+            self.beta0 = self.betas[-1]
+            self.P0 = self.Ps[-1]
+            self.var_eps = result.x[0] 
+            self.var_eta = result.x[1]
+            print("Optimization converged successfully")
+            print( "var_eps = {}, var_eta = {}".format(result.x[0], result.x[1]) )
+
+
+    def calibrate_R2(self, mode="pre-fit"):
+        """ Returns the result of the R2 calibration for the Beta Kalman filter, using the L-BFGS-B method. 
+        The calibrated parameters is var_eta
+        """
+
+        def minus_R2(c):
+            """ Function to minimize in order to calibrate the kalman parameters: var_eta and var_eps. """
+            self.var_eta = c
+            self.run()
+            if mode == "pre-fit":
+                return -1 * self.R2_pre_fit
+            elif mode == "post-fit":
+                return -1 * self.R2_post_fit
+        
+        result = minimize(minus_R2, x0=[self.var_eps], 
+                      method='L-BFGS-B', bounds=[[1e-15,1]], tol=1e-6)
+        
+        if result.success == True:
+            self.beta0 = self.betas[-1]
+            self.P0 = self.Ps[-1]
+            self.var_eta = result.x[0]
+            print("Optimization converged successfully")
+            print( "var_eta = {}".format(result.x[0]) )
+
+
+    def RTS_smoother(self, X, Y):
+        """
+        Kalman smoother for the beta estimation. It uses the Rauch–Tung–Striebel (RTS) algorithm. 
+        """
+        self.run(X,Y)
+        betas, Ps = self.betas, self.Ps 
+        
+        betas_smooth = np.zeros_like(betas)
+        Ps_smooth = np.zeros_like(Ps)
+        betas_smooth[-1] = betas[-1] 
+        Ps_smooth[-1] = Ps[-1]
+        
+        for k in range( len(X)-2,-1,-1):
+            C = Ps[k]/(Ps[k]+self.var_eta)  
+            betas_smooth[k] = betas[k] + C*( betas_smooth[k+1] - betas[k] )
+            Ps_smooth[k] = Ps[k] + C**2 *( Ps_smooth[k+1] - (Ps[k]+self.var_eta) )
+            
+        return betas_smooth, Ps_smooth 
+
 
 
 def rolling_regression_test(X, Y, rolling_window, training_size):
@@ -137,23 +232,6 @@ def rolling_regression_test(X, Y, rolling_window, training_size):
 
 
 
-def RTS_smoother(X, Y, alpha, beta0, var_eta, var_eps, P0):
-    """
-    Kalman smoother for the beta estimation. It uses the Rauch–Tung–Striebel (RTS) algorithm. 
-    """
-    betas, Ps = Kalman_beta(X, Y, alpha, beta0, var_eta, var_eps, P0 = 10, likelihood=False, Rsq=False)
-    
-    betas_smooth = np.zeros_like(betas)
-    Ps_smooth = np.zeros_like(Ps)
-    betas_smooth[-1] = betas[-1] 
-    Ps_smooth[-1] = Ps[-1]
-    
-    for k in range( len(X)-2,-1,-1):
-        C = Ps[k]/(Ps[k]+var_eta)  
-        betas_smooth[k] = betas[k] + C*( betas_smooth[k+1] - betas[k] )
-        Ps_smooth[k] = Ps[k] + C**2 *( Ps_smooth[k+1] - (Ps[k]+var_eta) )
-
-    return betas_smooth, Ps_smooth 
 
 
 
@@ -176,12 +254,16 @@ def plot_betas(X, Y, true_rho, rho_err, var_eta=None, training_size = 250, rolli
     X_test = X[training_size:] 
     Y_train = Y[:training_size] 
     Y_test = Y[training_size:] 
-    beta_tr, alpha_tr, _ ,_ ,_  = ss.linregress(X_train, Y_train)
-    resid_tr = Y_train - beta_tr * X_train - alpha_tr
-    var_eps = resid_tr.var(ddof=2)
+    #beta_tr, alpha_tr, _ ,_ ,_  = ss.linregress(X_train, Y_train)
+    #resid_tr = Y_train - beta_tr * X_train - alpha_tr
+    #var_eps = resid_tr.var(ddof=2)
+    
+    KR = Kalman_regression(X_train, Y_train)
+    var_eps = KR.var_eps
     
     if var_eta is None:
-        var_eta, var_eps = calibrate_Kalman_MLE(X_train, Y_train, alpha_tr, beta_tr, 10).x
+        KR.calibrate_MLE()
+        var_eta, var_eps = KR.var_eta, KR.var_eps
         if var_eta < 1e-8:
             print(" MLE FAILED.  var_eta set equal to var_eps")
             var_eta = var_eps
@@ -191,21 +273,21 @@ def plot_betas(X, Y, true_rho, rho_err, var_eta=None, training_size = 250, rolli
     print("var_eta = ", var_eta)
     print("var_eps = ", var_eps)
     
-    # last values of beta and P in the training set. Are used as initial values in the test set 
-    _, beta_last, P_last = Kalman_beta(X_train, Y_train, 0, beta_tr, var_eta, var_eps, 10, True)
+    KR.run(X_train, Y_train, var_eps=var_eps, var_eta=var_eta)
+    KR.beta0, KR.P0 = KR.betas[-1], KR.Ps[-1]
+    KR.run(X_test, Y_test)
     #   Kalman
-    betas_KF, Ps_KF = Kalman_beta(X_test, Y_test, 0, beta_last, var_eta, var_eps, P_last)
+    betas_KF, Ps_KF = KR.betas, KR.Ps
     # Rolling betas
     rolling_beta = rolling_regression_test(X, Y, rolling_window, training_size)
     # Smoother
-    betas_smooth, Ps_smooth = RTS_smoother(X_test, Y_test, 0, beta_last, var_eta, var_eps, P_last)
+    betas_smooth, Ps_smooth = KR.RTS_smoother(X_test, Y_test)
  
     plt.figure(figsize=(16,6))
     plt.plot(betas_KF, color="royalblue", label="Kalman filter betas")
     plt.plot(rolling_beta, color="orange", label="Rolling beta, window={}".format(rolling_window))
     plt.plot( betas_smooth, label="RTS smoother", color="maroon" )
     plt.plot(rho_err[training_size+1:], color="springgreen", marker='o', linestyle="None", label="rho with model error")
-#    x = np.array(range( len(X)-1 )) x[:(len(X)-1-training_size)],
     plt.plot( true_rho[training_size+1:], color="black", alpha=2, label="True rho")
     plt.fill_between(x=range(len(betas_KF)) ,y1=betas_KF + np.sqrt(Ps_KF), y2=betas_KF - np.sqrt(Ps_KF), 
                      alpha=0.5, linewidth=2, color='seagreen', label="Kalman Std Dev: $\pm 1 \sigma$")
