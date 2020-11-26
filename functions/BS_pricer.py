@@ -206,11 +206,12 @@ class BS_pricer():
         if self.payoff == "call":
             V[:,-1] = Payoff
             V[-1,:] = np.exp(x_max) - self.K * np.exp(-self.r* t[::-1] )
-            V[0,:] = 0
+            V[0,:]  = 0
         else:    
             V[:,-1] = Payoff
             V[-1,:] = 0
-            V[0,:] = self.K * np.exp(-self.r* t[::-1] )
+            V[0,:]  = Payoff[0] * np.exp(-self.r* t[::-1] )    # Instead of Payoff[0] I could use K 
+                                                    # For s to 0, the limiting value is e^(-rT)(K-s)     
         
         sig2 = self.sig**2 
         dxx = dx**2
@@ -295,8 +296,8 @@ class BS_pricer():
             plt.axis(axis)
         plt.xlabel("S")
         plt.ylabel("price")
-        plt.title("Black Scholes price")
-        plt.legend(loc='upper left')
+        plt.title(f"{self.exercise} - Black Scholes price")
+        plt.legend()
         plt.show()
         
         
@@ -309,7 +310,7 @@ class BS_pricer():
         
         X, Y = np.meshgrid( np.linspace(0, self.T, self.mesh.shape[1]) , self.S_vec)
         ax.plot_surface(Y, X, self.mesh, cmap=cm.ocean)
-        ax.set_title("BS price surface")
+        ax.set_title(f"{self.exercise} - BS price surface")
         ax.set_xlabel("S"); ax.set_ylabel("t"); ax.set_zlabel("V")
         ax.view_init(30, -100) # this function rotates the 3d plot
         plt.show()

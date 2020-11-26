@@ -48,3 +48,40 @@ def SOR(np.float64_t aa,
         if k==N_max:
             print("Fail to converge in {} iterations".format(k))
             return x_new
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def PSOR(np.float64_t aa, 
+        np.float64_t bb, np.float64_t cc, 
+        np.float64_t[:] B,  np.float64_t[:] C, 
+        np.float64_t w=1, np.float64_t eps=1e-10, unsigned int N_max = 500):
+    
+    cdef unsigned int N = B.size
+    
+    cdef np.float64_t[:] x0 = np.ones(N, dtype=np.float64)          # initial guess
+    cdef np.float64_t[:] x_new = np.ones(N, dtype=np.float64)       # new solution
+
+    cdef unsigned int i, k
+    cdef np.float64_t S
+    
+    for k in range(1,N_max+1):
+        for i in range(N):
+            if (i==0):
+                S = cc * x_new[1]
+            elif (i==N-1):
+                S = aa * x_new[N-2]
+            else:
+                S = aa * x_new[i-1] + cc * x_new[i+1]
+            x_new[i] = (1-w)*x_new[i] + (w/bb) * (B[i] - S)  
+            x_new[i] = x_new[i] if (x_new[i] > C[i]) else C[i]
+            
+        if distance2(x_new, x0, N) < eps*eps:
+            print("Convergence after {} iterations".format(k))
+            return x_new
+        x0[:] = x_new
+        if k==N_max:
+            print("Fail to converge in {} iterations".format(k))
+            return x_new
+
+
