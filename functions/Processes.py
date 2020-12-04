@@ -365,3 +365,40 @@ class GARCH():
         for i in range(1,N):
             var[i] = self.omega + self.alpha*R[i-1]**2 + self.beta*var[i-1]
         return var
+    
+    
+
+class OU_process():
+    """
+    Class for the OU process:
+    theta = long term mean
+    sigma = diffusion coefficient
+    kappa = mean reversion coefficient
+    """
+    def __init__(self, sigma=0.2, theta=-0.1, kappa=0.1):
+        self.theta = theta
+        if (sigma<0 or kappa<0):
+            raise ValueError("sigma,theta,kappa must be positive")
+        else:
+            self.sigma = sigma
+            self.kappa = kappa            
+    
+    def path(self, X0=0, T=1, N=10000, paths=1):
+        """
+        Produces a matrix of OU process:  X[paths,N]
+        X0 = starting point
+        N = number of time steps
+        T = Time in years
+        paths = number of paths
+        """
+        
+        T_vec, dt = np.linspace(0, T, N, retstep=True ) 
+        X = np.zeros((paths,N))
+        X[:,0] = X0
+        W = ss.norm.rvs( loc=0, scale=1, size=(paths,N-1) )
+
+        std_dt = np.sqrt( self.sigma**2 /(2*self.kappa) * (1-np.exp(-2*self.kappa*dt)) )
+        for t in range(0,N-1):
+            X[:,t+1] = self.theta + np.exp(-self.kappa*dt)*(X[:,t]-self.theta) + std_dt * W[:,t]        
+                
+        return X

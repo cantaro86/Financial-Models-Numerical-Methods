@@ -84,7 +84,7 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 *(Binary options, Barrier options, Asian options)*
 
 2.3) **American options**
-*(PDE, Binomial method, Longstaff-Schwartz)*
+*(PDE, Early exercise, Binomial method, Longstaff-Schwartz, Perpetual put)*
 
 3.1) **Merton Jump-Diffusion PIDE**
 *(Implicit-Explicit discretization, discrete convolution, model limitations, Monte Carlo, Fourier inversion, semi-closed formula )*
@@ -109,6 +109,9 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 
 5.3) **Volatility tracking** 
 *(Heston simulation, hypothesis testing, distribution fitting, estimation methods, GARCH(1,1), Kalman filter, Kalman smoother)*
+
+6.1) **Ornstein-Uhlenbeck process and applications**
+*(parameters estimation, hitting time, Vasicek PDE, Kalman filter, trading strategy)*
 
 A.1) **Appendix: Linear equations** 
 *(LU, Jacobi, Gauss-Seidel, SOR, Thomas)*
