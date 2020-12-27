@@ -113,6 +113,9 @@ If you have any kind of questions, or if you find some errors, or you have sugge
 6.1) **Ornstein-Uhlenbeck process and applications**
 *(parameters estimation, hitting time, Vasicek PDE, Kalman filter, trading strategy)*
 
+7.1) **Classical MVO**
+*(mean variance optimization, quadratic programming, only long and long-short, closed formula)*
+
 A.1) **Appendix: Linear equations** 
 *(LU, Jacobi, Gauss-Seidel, SOR, Thomas)*
   
