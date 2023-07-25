@@ -131,7 +131,7 @@ A.3) **Appendix: Review of Lévy processes theory**
 
 You have several options:
 
-1) **Docker:** Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
+**Docker:** Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
 
 At this point, you just need to run the script `docker_start_notebook.py`, i.e enter in the shell the following code:
 
@@ -141,16 +141,44 @@ python docker_start_notebook.py
 
 The script will download the data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook), that will be used every time you run the script (the script will take about 10-15 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 
-2) **Virtual environment:**
-Here I explain how to create a virtual environment with [Anaconda](https://www.anaconda.com/distribution/). A possible alternative could be to use the python module [venv](https://docs.python.org/3.7/tutorial/venv.html). 
+**Virtual environment:**
+Here I explain how to create a virtual environment with [Anaconda](https://www.anaconda.com/distribution/) and with the python module [venv](https://docs.python.org/3.7/tutorial/venv.html). 
+
+- Option 1:
+
+You can recreate my tested conda virtual environment with:
 
 ```bash
-conda create -n FMNM python=3.7.3
-source activate FMNM
+conda env create -f environment.yml
+```
+
+- Option 2:
+
+If you want to create a new environment with the latest python version, you can do: 
+
+```bash
+conda create -n FMNM python
+conda activate FMNM
+PACKAGES=$(tr '\n' ' ' < list_of_used_packages.txt | sed "s/arch/arch-py/g")
+conda install ${PACKAGES[@]}
+```
+
+where in the third line we replace the package name `arch` with the `arch-py`, which is the name used by conda.   
+
+- Option 3:
+
+If you prefer to create a `venv` that uses python 3.11.4, you can do it as follows:
+
+```bash
+python3.11.4 -m venv --prompt FMNM python-venv
+source python-venv/bin/activate
+python3 -m pip install --upgrade pip
 pip install --requirement requirements.txt
 ```
 
-3) If you prefer to use the python version already installed in your system, you just need to check that all the packages listed in `requirements.txt` are installed, and then enter in the shell the code:
+- Option 4:
+
+If you prefer to use the python version already installed in your system, you just need to check that all the packages listed in `list_of_used_packages.txt` are installed, and then enter in the shell the code:
 
 ```bash
 jupyter-notebook
@@ -158,7 +186,7 @@ jupyter-notebook
 
 However, if you are using old versions, there could be compatibility problems.
 
-
+----------------------------------------------------------------------------------
 #### If you wish to use a different python version or a different docker image, you will probably need to recompile the Cython code!
 
 If you are using the data science image, you can open the shell in the notebooks directory, and run the script 

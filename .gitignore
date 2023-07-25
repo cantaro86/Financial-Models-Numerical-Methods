@@ -15,6 +15,7 @@
 
 .ipynb_checkpoints
 temp/
+python-venv
 functions/__pycache__/
 functions/cython/build/
 functions/cython/__pycache__/
