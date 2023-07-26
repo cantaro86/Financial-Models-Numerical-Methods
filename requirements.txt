@@ -10,10 +10,12 @@ attrs==23.1.0
 Babel==2.12.1
 backcall==0.2.0
 beautifulsoup4==4.12.2
+black==23.7.0
 bleach==6.0.0
 certifi==2023.7.22
 cffi==1.15.1
 charset-normalizer==3.2.0
+click==8.1.6
 comm==0.1.3
 contourpy==1.1.0
 cvxpy==1.3.2
@@ -25,6 +27,7 @@ defusedxml==0.7.1
 ecos==2.0.12
 executing==1.2.0
 fastjsonschema==2.18.0
+flake8==6.0.0
 fonttools==4.41.1
 fqdn==1.5.1
 idna==3.4
@@ -56,8 +59,10 @@ kiwisolver==1.4.4
 MarkupSafe==2.1.3
 matplotlib==3.7.2
 matplotlib-inline==0.1.6
+mccabe==0.7.0
 mistune==3.0.1
 mpmath==1.3.0
+mypy-extensions==1.0.0
 nbclient==0.8.0
 nbconvert==7.7.2
 nbformat==5.9.1
@@ -71,6 +76,7 @@ packaging==23.1
 pandas==2.0.3
 pandocfilters==1.5.0
 parso==0.8.3
+pathspec==0.11.1
 patsy==0.5.3
 pexpect==4.8.0
 pickleshare==0.7.5
@@ -81,7 +87,9 @@ prompt-toolkit==3.0.39
 psutil==5.9.5
 ptyprocess==0.7.0
 pure-eval==0.2.2
+pycodestyle==2.10.0
 pycparser==2.21
+pyflakes==3.0.1
 Pygments==2.15.1
 pyparsing==3.0.9
 python-dateutil==2.8.2
@@ -110,6 +118,7 @@ sympy==1.12
 terminado==0.17.1
 threadpoolctl==3.2.0
 tinycss2==1.2.1
+tokenize-rt==5.1.0
 tornado==6.3.2
 traitlets==5.9.0
 tzdata==2023.3
