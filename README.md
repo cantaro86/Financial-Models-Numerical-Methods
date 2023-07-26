@@ -129,17 +129,6 @@ A.3) **Appendix: Review of Lévy processes theory**
 
 ## How to run the notebooks 
 
-You have several options:
-
-**Docker:** Install [docker](https://www.docker.com/) following the instructions in [install link](https://docs.docker.com/install/) 
-
-At this point, you just need to run the script `docker_start_notebook.py`, i.e enter in the shell the following code:
-
-```bash
-python docker_start_notebook.py
-```
-
-The script will download the data-science docker image [scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook), that will be used every time you run the script (the script will take about 10-15 minutes to download the image, ONLY the first time). You can also download a different image by modifying the script. For a list of images see [here](https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html).
 
 **Virtual environment:**
 Here I explain how to create a virtual environment with [Anaconda](https://www.anaconda.com/distribution/) and with the python module [venv](https://docs.python.org/3.7/tutorial/venv.html). 
@@ -159,7 +148,7 @@ If you want to create a new environment with the latest python version, you can 
 ```bash
 conda create -n FMNM python
 conda activate FMNM
-PACKAGES=$(tr '\n' ' ' < list_of_used_packages.txt | sed "s/arch/arch-py/g")
+PACKAGES=$(tr '\n' ' ' < list_of_packages.txt | sed "s/arch/arch-py/g")
 conda install ${PACKAGES[@]}
 ```
 
@@ -178,38 +167,15 @@ pip install --requirement requirements.txt
 
 - Option 4:
 
-If you prefer to use the python version already installed in your system, you just need to check that all the packages listed in `list_of_used_packages.txt` are installed, and then enter in the shell the code:
+If you prefer to use the python version already installed in your system, you just need to run     
+`pip install --requirement list_of_packages.txt`     
+and then enter in the shell:
 
 ```bash
 jupyter-notebook
 ```
 
+
 However, if you are using old versions, there could be compatibility problems.
-
-----------------------------------------------------------------------------------
-#### If you wish to use a different python version or a different docker image, you will probably need to recompile the Cython code!
-
-If you are using the data science image, you can open the shell in the notebooks directory, and run the script 
-```bash
-python docker_start_notebook.py
-```
-
-after that, paste the following code into the shell:
-
-```bash 
-docker exec -it Numeric_Finance bash
-cd work/functions/cython
-python setup.py build_ext --inplace
-exit
-``` 
-(`Numeric_Finance` is the name of the docker container)
-
-If you are not using docker, just copy in the shell the following:
-
-```bash 
-cd functions/cython
-python setup.py build_ext --inplace
-``` 
-
 
 ### Enjoy!
