@@ -14,9 +14,13 @@
 *~
 
 .ipynb_checkpoints
-temp/
+temp
+build
 python-venv
-functions/__pycache__/
-functions/cython/build/
-functions/cython/__pycache__/
-functions/C/*.o
+src/FMNM/__pycache__/
+src/FMNM/cython/build/
+src/FMNM/cython/__pycache__/
+src/C/*.o
+src/FMNM/FMNM.egg-info
+src/FMNM.egg-info
+src/*.so

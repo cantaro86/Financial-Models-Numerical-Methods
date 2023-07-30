@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm", "numpy", "cython"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "FMNM"
+version = "1.0.0"
+authors = [{ name = "cantaro86", email = "nicolacantarutti@gmail.com" }]
+description = "Library for the code used in the FMNM notebooks."
+readme = "README.md"
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["list_of_packages.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["FMNM*"]  
+exclude = ["C*"]
+
+[project.urls]
+"Homepage" = "https://github.com/cantaro86/Financial-Models-Numerical-Methods"

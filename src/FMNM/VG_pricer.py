@@ -18,10 +18,10 @@ import scipy.special as scps
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from functions.CF import cf_VG
-from functions.probabilities import Q1, Q2
+from src.FMNM.CF import cf_VG
+from src.FMNM.probabilities import Q1, Q2
 from functools import partial
-from functions.FFT import fft_Lewis, IV_from_Lewis
+from src.FMNM.FFT import fft_Lewis, IV_from_Lewis
 
 
 class VG_pricer:

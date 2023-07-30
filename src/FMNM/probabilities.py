@@ -9,7 +9,7 @@ Created on Mon Oct  7 18:33:39 2019
 import numpy as np
 from scipy.integrate import quad
 from functools import partial
-from functions.CF import cf_Heston_good
+from src.FMNM.CF import cf_Heston_good
 import scipy.special as scps
 from math import factorial
 

@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from time import time
 import scipy.stats as ss
-from functions.Solvers import Thomas
-from functions.cython.cython_functions import SOR
-from functions.CF import cf_normal
-from functions.probabilities import Q1, Q2
+from src.FMNM.Solvers import Thomas
+from src.cython_functions import SOR
+from src.FMNM.CF import cf_normal
+from src.FMNM.probabilities import Q1, Q2
 from functools import partial
-from functions.FFT import fft_Lewis, IV_from_Lewis
+from src.FMNM.FFT import fft_Lewis, IV_from_Lewis
 
 
 class BS_pricer:

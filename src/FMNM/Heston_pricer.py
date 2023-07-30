@@ -11,11 +11,11 @@ import numpy as np
 import scipy as scp
 import scipy.stats as ss
 
-from functions.CF import cf_Heston_good
-from functions.cython.cython_Heston import Heston_paths
-from functions.probabilities import Q1, Q2
+from src.FMNM.CF import cf_Heston_good
+from src.FMNM.cython.cython_Heston import Heston_paths
+from src.FMNM.probabilities import Q1, Q2
 from functools import partial
-from functions.FFT import fft_Lewis, IV_from_Lewis
+from src.FMNM.FFT import fft_Lewis, IV_from_Lewis
 
 
 class Heston_pricer:

@@ -139,7 +139,11 @@ You can recreate my tested conda virtual environment with:
 
 ```bash
 conda env create -f environment.yml
+pip install -e .
 ```
+
+The first line recreates the virtual environment and installs all the packages.    
+With the second line we just install the local package `FMNM`.
 
 - Option 2:
 
@@ -150,6 +154,7 @@ conda create -n FMNM python
 conda activate FMNM
 PACKAGES=$(tr '\n' ' ' < list_of_packages.txt | sed "s/arch/arch-py/g")
 conda install ${PACKAGES[@]}
+pip install -e .
 ```
 
 where in the third line we replace the package name `arch` with the `arch-py`, which is the name used by conda.   
@@ -163,12 +168,18 @@ python3.11.4 -m venv --prompt FMNM python-venv
 source python-venv/bin/activate
 python3 -m pip install --upgrade pip
 pip install --requirement requirements.txt
+pip install -e .
 ```
 
 - Option 4:
 
 If you prefer to use the python version already installed in your system, you just need to run     
-`pip install --requirement list_of_packages.txt`     
+
+```bash
+pip install --requirement list_of_packages.txt
+pip install -e .
+```     
+
 and then enter in the shell:
 
 ```bash

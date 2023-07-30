@@ -9,7 +9,7 @@ Created on Mon Jun 10 09:56:25 2019
 from time import time
 import numpy as np
 import numpy.matlib
-import functions.cost_utils as cost
+import src.FMNM.cost_utils as cost
 
 
 class TC_pricer:
