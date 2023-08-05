@@ -52,9 +52,7 @@ class TC_pricer:
         np.seterr(all="ignore")  # ignore Warning for overflows
 
         x0 = np.log(self.S0)  # current log-price
-        T_vec, dt = np.linspace(
-            0, self.T, N + 1, retstep=True
-        )  # vector of time steps and time steps
+        T_vec, dt = np.linspace(0, self.T, N + 1, retstep=True)  # vector of time steps and time steps
         delta = np.exp(-self.r * (self.T - T_vec))  # discount factor
         dx = self.sig * np.sqrt(dt)  # space step1
         dy = dx  # space step2
@@ -72,24 +70,15 @@ class TC_pricer:
         for portfolio in ["no_opt", TYPE]:
             # interates on the zero option and writer/buyer portfolios
             # Tree nodes at time N
-            x = np.array(
-                [
-                    x0 + (self.mu - 0.5 * self.sig**2) * dt * N + (2 * i - N) * dx
-                    for i in range(N + 1)
-                ]
-            )
+            x = np.array([x0 + (self.mu - 0.5 * self.sig**2) * dt * N + (2 * i - N) * dx for i in range(N + 1)])
 
             # Terminal conditions
             if portfolio == "no_opt":
                 Q = np.exp(-self.gamma * cost.no_opt(x, y, self.cost_b, self.cost_s))
             elif portfolio == "writer":
-                Q = np.exp(
-                    -self.gamma * cost.writer(x, y, self.cost_b, self.cost_s, self.K)
-                )
+                Q = np.exp(-self.gamma * cost.writer(x, y, self.cost_b, self.cost_s, self.K))
             elif portfolio == "buyer":
-                Q = np.exp(
-                    -self.gamma * cost.buyer(x, y, self.cost_b, self.cost_s, self.K)
-                )
+                Q = np.exp(-self.gamma * cost.buyer(x, y, self.cost_b, self.cost_s, self.K))
             else:
                 raise ValueError("TYPE can be only writer or buyer")
 
@@ -98,12 +87,7 @@ class TC_pricer:
                 Q_new = (Q[:-1, :] + Q[1:, :]) / 2
 
                 # create the logprice vector at time k
-                x = np.array(
-                    [
-                        x0 + (self.mu - 0.5 * self.sig**2) * dt * k + (2 * i - k) * dx
-                        for i in range(k + 1)
-                    ]
-                )
+                x = np.array([x0 + (self.mu - 0.5 * self.sig**2) * dt * k + (2 * i - k) * dx for i in range(k + 1)])
 
                 # buy term
                 Buy = np.copy(Q_new)
@@ -111,9 +95,7 @@ class TC_pricer:
 
                 # sell term
                 Sell = np.copy(Q_new)
-                Sell[:, 1:] = (
-                    np.matlib.repmat(G(x, dy, k), N_y - 1, 1).T * Q_new[:, :-1]
-                )
+                Sell[:, 1:] = np.matlib.repmat(G(x, dy, k), N_y - 1, 1).T * Q_new[:, :-1]
 
                 # update the Q(:,:,k)
                 Q = np.minimum(np.minimum(Buy, Sell), Q_new)

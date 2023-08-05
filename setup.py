@@ -24,7 +24,5 @@ extensions = [
 setup(
     name="fmnm_cython",
     cmdclass={"build_ext": build_ext},
-    ext_modules=cythonize(
-        extensions, language_level="3", build_dir="src/FMNM/cython/build"
-    ),
+    ext_modules=cythonize(extensions, language_level="3", build_dir="src/FMNM/cython/build"),
 )

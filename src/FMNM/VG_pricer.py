@@ -46,13 +46,8 @@ class VG_pricer:
         self.sigma = Process_info.sigma  # VG parameter
         self.theta = Process_info.theta  # VG parameter
         self.kappa = Process_info.kappa  # VG parameter
-        self.exp_RV = (
-            Process_info.exp_RV
-        )  # function to generate exponential VG Random Variables
-        self.w = (
-            -np.log(1 - self.theta * self.kappa - self.kappa / 2 * self.sigma**2)
-            / self.kappa
-        )  # coefficient w
+        self.exp_RV = Process_info.exp_RV  # function to generate exponential VG Random Variables
+        self.w = -np.log(1 - self.theta * self.kappa - self.kappa / 2 * self.sigma**2) / self.kappa  # coefficient w
 
         self.S0 = Option_info.S0  # current price
         self.K = Option_info.K  # strike
@@ -78,33 +73,18 @@ class VG_pricer:
         """
 
         def Psy(a, b, g):
-            f = (
-                lambda u: ss.norm.cdf(a / np.sqrt(u) + b * np.sqrt(u))
-                * u ** (g - 1)
-                * np.exp(-u)
-                / scps.gamma(g)
-            )
+            f = lambda u: ss.norm.cdf(a / np.sqrt(u) + b * np.sqrt(u)) * u ** (g - 1) * np.exp(-u) / scps.gamma(g)
             result = quad(f, 0, np.inf)
             return result[0]
 
         # Ugly parameters
         xi = -self.theta / self.sigma**2
-        s = self.sigma / np.sqrt(
-            1 + ((self.theta / self.sigma) ** 2) * (self.kappa / 2)
-        )
+        s = self.sigma / np.sqrt(1 + ((self.theta / self.sigma) ** 2) * (self.kappa / 2))
         alpha = xi * s
 
         c1 = self.kappa / 2 * (alpha + s) ** 2
         c2 = self.kappa / 2 * alpha**2
-        d = (
-            1
-            / s
-            * (
-                np.log(self.S0 / self.K)
-                + self.r * self.T
-                + self.T / self.kappa * np.log((1 - c1) / (1 - c2))
-            )
-        )
+        d = 1 / s * (np.log(self.S0 / self.K) + self.r * self.T + self.T / self.kappa * np.log((1 - c1) / (1 - c2)))
 
         # Closed formula
         call = self.S0 * Psy(
@@ -140,16 +120,12 @@ class VG_pricer:
 
         right_lim = 5000  # using np.inf may create warnings
         if self.payoff == "call":
-            call = self.S0 * Q1(k, cf_VG_b, right_lim) - self.K * np.exp(
-                -self.r * self.T
-            ) * Q2(
+            call = self.S0 * Q1(k, cf_VG_b, right_lim) - self.K * np.exp(-self.r * self.T) * Q2(
                 k, cf_VG_b, right_lim
             )  # pricing function
             return call
         elif self.payoff == "put":
-            put = self.K * np.exp(-self.r * self.T) * (
-                1 - Q2(k, cf_VG_b, right_lim)
-            ) - self.S0 * (
+            put = self.K * np.exp(-self.r * self.T) * (1 - Q2(k, cf_VG_b, right_lim)) - self.S0 * (
                 1 - Q1(k, cf_VG_b, right_lim)
             )  # pricing function
             return put
@@ -199,9 +175,7 @@ class VG_pricer:
             return fft_Lewis(K, self.S0, self.r, self.T, cf_VG_b, interp="cubic")
         elif self.payoff == "put":  # put-call parity
             return (
-                fft_Lewis(K, self.S0, self.r, self.T, cf_VG_b, interp="cubic")
-                - self.S0
-                + K * np.exp(-self.r * self.T)
+                fft_Lewis(K, self.S0, self.r, self.T, cf_VG_b, interp="cubic") - self.S0 + K * np.exp(-self.r * self.T)
             )
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
@@ -242,15 +216,11 @@ class VG_pricer:
         x_max = np.log(S_max)
         x_min = np.log(S_min)
 
-        dev_X = np.sqrt(
-            self.sigma**2 + self.theta**2 * self.kappa
-        )  # std dev VG process
+        dev_X = np.sqrt(self.sigma**2 + self.theta**2 * self.kappa)  # std dev VG process
 
         dx = (x_max - x_min) / (Nspace - 1)
         extraP = int(np.floor(5 * dev_X / dx))  # extra points beyond the B.C.
-        x = np.linspace(
-            x_min - extraP * dx, x_max + extraP * dx, Nspace + 2 * extraP
-        )  # space discretization
+        x = np.linspace(x_min - extraP * dx, x_max + extraP * dx, Nspace + 2 * extraP)  # space discretization
         t, dt = np.linspace(0, self.T, Ntime, retstep=True)  # time discretization
 
         Payoff = self.payoff_f(np.exp(x))
@@ -259,26 +229,19 @@ class VG_pricer:
 
         if self.payoff == "call":
             V[:, -1] = Payoff  # terminal conditions
-            V[-extraP - 1 :, :] = np.exp(x[-extraP - 1 :]).reshape(
-                extraP + 1, 1
-            ) * np.ones((extraP + 1, Ntime)) - self.K * np.exp(
-                -self.r * t[::-1]
-            ) * np.ones(
+            V[-extraP - 1 :, :] = np.exp(x[-extraP - 1 :]).reshape(extraP + 1, 1) * np.ones(
+                (extraP + 1, Ntime)
+            ) - self.K * np.exp(-self.r * t[::-1]) * np.ones(
                 (extraP + 1, Ntime)
             )  # boundary condition
             V[: extraP + 1, :] = 0
         else:
             V[:, -1] = Payoff
             V[-extraP - 1 :, :] = 0
-            V[: extraP + 1, :] = (
-                self.K * np.exp(-self.r * t[::-1]) * np.ones((extraP + 1, Ntime))
-            )
+            V[: extraP + 1, :] = self.K * np.exp(-self.r * t[::-1]) * np.ones((extraP + 1, Ntime))
 
         A = self.theta / (self.sigma**2)
-        B = (
-            np.sqrt(self.theta**2 + 2 * self.sigma**2 / self.kappa)
-            / self.sigma**2
-        )
+        B = np.sqrt(self.theta**2 + 2 * self.sigma**2 / self.kappa) / self.sigma**2
 
         def levy_m(y):
             """Levy measure VG"""
@@ -286,21 +249,17 @@ class VG_pricer:
 
         eps = 1.5 * dx  # the cutoff near 0
         lam = (
-            quad(levy_m, -(extraP + 1.5) * dx, -eps)[0]
-            + quad(levy_m, eps, (extraP + 1.5) * dx)[0]
+            quad(levy_m, -(extraP + 1.5) * dx, -eps)[0] + quad(levy_m, eps, (extraP + 1.5) * dx)[0]
         )  # approximated intensity
 
         def int_w(y):
             """integrator"""
             return (np.exp(y) - 1) * levy_m(y)
 
-        int_s = (
-            lambda y: np.abs(y) * np.exp(A * y - B * np.abs(y)) / self.kappa
-        )  # avoid division by zero
+        int_s = lambda y: np.abs(y) * np.exp(A * y - B * np.abs(y)) / self.kappa  # avoid division by zero
 
         w = (
-            quad(int_w, -(extraP + 1.5) * dx, -eps)[0]
-            + quad(int_w, eps, (extraP + 1.5) * dx)[0]
+            quad(int_w, -(extraP + 1.5) * dx, -eps)[0] + quad(int_w, eps, (extraP + 1.5) * dx)[0]
         )  # is the approx of omega
 
         sig2 = quad(int_s, -eps, eps)[0]  # the small jumps variance
@@ -314,9 +273,7 @@ class VG_pricer:
 
         nu = np.zeros(2 * extraP + 3)  # Lévy measure vector
         x_med = extraP + 1  # middle point in nu vector
-        x_nu = np.linspace(
-            -(extraP + 1 + 0.5) * dx, (extraP + 1 + 0.5) * dx, 2 * (extraP + 2)
-        )  # integration domain
+        x_nu = np.linspace(-(extraP + 1 + 0.5) * dx, (extraP + 1 + 0.5) * dx, 2 * (extraP + 2))  # integration domain
         for i in range(len(nu)):
             if (i == x_med) or (i == x_med - 1) or (i == x_med + 1):
                 continue
@@ -338,9 +295,7 @@ class VG_pricer:
                 V_jump = V[extraP + 1 : -extraP - 1, i + 1] + dt * signal.convolve(
                     V[:, i + 1], nu[::-1], mode="valid", method="auto"
                 )
-                V[extraP + 1 : -extraP - 1, i] = np.maximum(
-                    DD.solve(V_jump - offset), Payoff[extraP + 1 : -extraP - 1]
-                )
+                V[extraP + 1 : -extraP - 1, i] = np.maximum(DD.solve(V_jump - offset), Payoff[extraP + 1 : -extraP - 1])
 
         X0 = np.log(self.S0)  # current log-price
         self.S_vec = np.exp(x[extraP + 1 : -extraP - 1])  # vector of S
@@ -393,16 +348,9 @@ class VG_pricer:
         """
 
         def Phi(alpha, beta, gamm, x, y):
-            f = (
-                lambda u: u ** (alpha - 1)
-                * (1 - u) ** (gamm - alpha - 1)
-                * (1 - u * x) ** (-beta)
-                * np.exp(u * y)
-            )
+            f = lambda u: u ** (alpha - 1) * (1 - u) ** (gamm - alpha - 1) * (1 - u * x) ** (-beta) * np.exp(u * y)
             result = quad(f, 0.00000001, 0.99999999)
-            return (
-                scps.gamma(gamm) / (scps.gamma(alpha) * scps.gamma(gamm - alpha))
-            ) * result[0]
+            return (scps.gamma(gamm) / (scps.gamma(alpha) * scps.gamma(gamm - alpha))) * result[0]
 
         def Psy(a, b, g):
             c = np.abs(a) * np.sqrt(2 + b**2)
@@ -428,22 +376,12 @@ class VG_pricer:
 
         # Ugly parameters
         xi = -self.theta / self.sigma**2
-        s = self.sigma / np.sqrt(
-            1 + ((self.theta / self.sigma) ** 2) * (self.kappa / 2)
-        )
+        s = self.sigma / np.sqrt(1 + ((self.theta / self.sigma) ** 2) * (self.kappa / 2))
         alpha = xi * s
 
         c1 = self.kappa / 2 * (alpha + s) ** 2
         c2 = self.kappa / 2 * alpha**2
-        d = (
-            1
-            / s
-            * (
-                np.log(self.S0 / self.K)
-                + self.r * self.T
-                + self.T / self.kappa * np.log((1 - c1) / (1 - c2))
-            )
-        )
+        d = 1 / s * (np.log(self.S0 / self.K) + self.r * self.T + self.T / self.kappa * np.log((1 - c1) / (1 - c2)))
 
         # Closed formula
         call = self.S0 * Psy(

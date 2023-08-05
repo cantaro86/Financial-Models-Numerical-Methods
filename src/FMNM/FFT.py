@@ -34,27 +34,15 @@ def fft_Lewis(K, S0, r, T, cf, interp="cubic"):
     b = N * dk / 2
     ks = -b + dk * np.arange(N)
 
-    integrand = (
-        np.exp(-1j * b * np.arange(N) * dx)
-        * cf(x - 0.5j)
-        * 1
-        / (x**2 + 0.25)
-        * weight
-        * dx
-        / 3
-    )
+    integrand = np.exp(-1j * b * np.arange(N) * dx) * cf(x - 0.5j) * 1 / (x**2 + 0.25) * weight * dx / 3
     integral_value = np.real(ifft(integrand) * N)
 
     if interp == "linear":
         spline_lin = interp1d(ks, integral_value, kind="linear")
-        prices = S0 - np.sqrt(S0 * K) * np.exp(-r * T) / np.pi * spline_lin(
-            np.log(S0 / K)
-        )
+        prices = S0 - np.sqrt(S0 * K) * np.exp(-r * T) / np.pi * spline_lin(np.log(S0 / K))
     elif interp == "cubic":
         spline_cub = interp1d(ks, integral_value, kind="cubic")
-        prices = S0 - np.sqrt(S0 * K) * np.exp(-r * T) / np.pi * spline_cub(
-            np.log(S0 / K)
-        )
+        prices = S0 - np.sqrt(S0 * K) * np.exp(-r * T) / np.pi * spline_cub(np.log(S0 / K))
     return prices
 
 
@@ -68,11 +56,7 @@ def IV_from_Lewis(K, S0, T, r, cf, disp=False):
         integrand = (
             lambda u: np.real(
                 np.exp(u * k * 1j)
-                * (
-                    cf(u - 0.5j)
-                    - np.exp(1j * u * r * T + 0.5 * r * T)
-                    * np.exp(-0.5 * T * (u**2 + 0.25) * sig**2)
-                )
+                * (cf(u - 0.5j) - np.exp(1j * u * r * T + 0.5 * r * T) * np.exp(-0.5 * T * (u**2 + 0.25) * sig**2))
             )
             * 1
             / (u**2 + 0.25)

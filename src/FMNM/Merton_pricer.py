@@ -46,9 +46,7 @@ class Merton_pricer:
         self.lam = Process_info.lam  # jump activity
         self.muJ = Process_info.muJ  # jump mean
         self.sigJ = Process_info.sigJ  # jump std
-        self.exp_RV = (
-            Process_info.exp_RV
-        )  # function to generate exponential Merton Random Variables
+        self.exp_RV = Process_info.exp_RV  # function to generate exponential Merton Random Variables
 
         self.S0 = Option_info.S0  # current price
         self.K = Option_info.K  # strike
@@ -78,9 +76,7 @@ class Merton_pricer:
 
         tot = 0
         for i in range(18):
-            tot += (
-                np.exp(-lam2 * self.T) * (lam2 * self.T) ** i / factorial(i)
-            ) * BS_pricer.BlackScholes(
+            tot += (np.exp(-lam2 * self.T) * (lam2 * self.T) ** i / factorial(i)) * BS_pricer.BlackScholes(
                 self.payoff,
                 self.S0,
                 self.K,
@@ -107,16 +103,12 @@ class Merton_pricer:
         )
 
         if self.payoff == "call":
-            call = self.S0 * Q1(k, cf_Mert, np.inf) - self.K * np.exp(
-                -self.r * self.T
-            ) * Q2(
+            call = self.S0 * Q1(k, cf_Mert, np.inf) - self.K * np.exp(-self.r * self.T) * Q2(
                 k, cf_Mert, np.inf
             )  # pricing function
             return call
         elif self.payoff == "put":
-            put = self.K * np.exp(-self.r * self.T) * (
-                1 - Q2(k, cf_Mert, np.inf)
-            ) - self.S0 * (
+            put = self.K * np.exp(-self.r * self.T) * (1 - Q2(k, cf_Mert, np.inf)) - self.S0 * (
                 1 - Q1(k, cf_Mert, np.inf)
             )  # pricing function
             return put
@@ -144,9 +136,7 @@ class Merton_pricer:
             return fft_Lewis(K, self.S0, self.r, self.T, cf_Mert, interp="cubic")
         elif self.payoff == "put":  # put-call parity
             return (
-                fft_Lewis(K, self.S0, self.r, self.T, cf_Mert, interp="cubic")
-                - self.S0
-                + K * np.exp(-self.r * self.T)
+                fft_Lewis(K, self.S0, self.r, self.T, cf_Mert, interp="cubic") - self.S0 + K * np.exp(-self.r * self.T)
             )
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
@@ -217,9 +207,7 @@ class Merton_pricer:
 
         dx = (x_max - x_min) / (Nspace - 1)
         extraP = int(np.floor(5 * dev_X / dx))  # extra points beyond the B.C.
-        x = np.linspace(
-            x_min - extraP * dx, x_max + extraP * dx, Nspace + 2 * extraP
-        )  # space discretization
+        x = np.linspace(x_min - extraP * dx, x_max + extraP * dx, Nspace + 2 * extraP)  # space discretization
         t, dt = np.linspace(0, self.T, Ntime, retstep=True)  # time discretization
 
         Payoff = self.payoff_f(np.exp(x))
@@ -228,37 +216,26 @@ class Merton_pricer:
 
         if self.payoff == "call":
             V[:, -1] = Payoff  # terminal conditions
-            V[-extraP - 1 :, :] = np.exp(x[-extraP - 1 :]).reshape(
-                extraP + 1, 1
-            ) * np.ones((extraP + 1, Ntime)) - self.K * np.exp(
-                -self.r * t[::-1]
-            ) * np.ones(
+            V[-extraP - 1 :, :] = np.exp(x[-extraP - 1 :]).reshape(extraP + 1, 1) * np.ones(
+                (extraP + 1, Ntime)
+            ) - self.K * np.exp(-self.r * t[::-1]) * np.ones(
                 (extraP + 1, Ntime)
             )  # boundary condition
             V[: extraP + 1, :] = 0
         else:
             V[:, -1] = Payoff
             V[-extraP - 1 :, :] = 0
-            V[: extraP + 1, :] = (
-                self.K * np.exp(-self.r * t[::-1]) * np.ones((extraP + 1, Ntime))
-            )
+            V[: extraP + 1, :] = self.K * np.exp(-self.r * t[::-1]) * np.ones((extraP + 1, Ntime))
 
         cdf = ss.norm.cdf(
-            [
-                np.linspace(
-                    -(extraP + 1 + 0.5) * dx, (extraP + 1 + 0.5) * dx, 2 * (extraP + 2)
-                )
-            ],
+            [np.linspace(-(extraP + 1 + 0.5) * dx, (extraP + 1 + 0.5) * dx, 2 * (extraP + 2))],
             loc=self.muJ,
             scale=self.sigJ,
         )[0]
         nu = self.lam * (cdf[1:] - cdf[:-1])
 
         lam_appr = sum(nu)
-        m_appr = (
-            np.array([np.exp(i * dx) - 1 for i in range(-(extraP + 1), extraP + 2)])
-            @ nu
-        )
+        m_appr = np.array([np.exp(i * dx) - 1 for i in range(-(extraP + 1), extraP + 2)]) @ nu
 
         sig2 = self.sig**2
         dxx = dx**2
@@ -283,9 +260,7 @@ class Merton_pricer:
                 V_jump = V[extraP + 1 : -extraP - 1, i + 1] + dt * signal.convolve(
                     V[:, i + 1], nu[::-1], mode="valid", method="fft"
                 )
-                V[extraP + 1 : -extraP - 1, i] = np.maximum(
-                    DD.solve(V_jump - offset), Payoff[extraP + 1 : -extraP - 1]
-                )
+                V[extraP + 1 : -extraP - 1, i] = np.maximum(DD.solve(V_jump - offset), Payoff[extraP + 1 : -extraP - 1])
 
         X0 = np.log(self.S0)  # current log-price
         self.S_vec = np.exp(x[extraP + 1 : -extraP - 1])  # vector of S

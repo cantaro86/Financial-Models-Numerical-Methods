@@ -113,14 +113,14 @@ class Heston_pricer:
         limit_max = 2000  # right limit in the integration
 
         if self.payoff == "call":
-            call = self.S0 * Q1(k, cf_H_b_good, limit_max) - self.K * np.exp(
-                -self.r * self.T
-            ) * Q2(k, cf_H_b_good, limit_max)
+            call = self.S0 * Q1(k, cf_H_b_good, limit_max) - self.K * np.exp(-self.r * self.T) * Q2(
+                k, cf_H_b_good, limit_max
+            )
             return call
         elif self.payoff == "put":
-            put = self.K * np.exp(-self.r * self.T) * (
-                1 - Q2(k, cf_H_b_good, limit_max)
-            ) - self.S0 * (1 - Q1(k, cf_H_b_good, limit_max))
+            put = self.K * np.exp(-self.r * self.T) * (1 - Q2(k, cf_H_b_good, limit_max)) - self.S0 * (
+                1 - Q1(k, cf_H_b_good, limit_max)
+            )
             return put
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")

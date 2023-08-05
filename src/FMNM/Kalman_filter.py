@@ -26,9 +26,7 @@ class Kalman_regression:
     P0 = initial covariance of beta
     """
 
-    def __init__(
-        self, X, Y, alpha0=None, beta0=None, var_eta=None, var_eps=None, P0=10
-    ):
+    def __init__(self, X, Y, alpha0=None, beta0=None, var_eta=None, var_eps=None, P0=10):
         self.alpha0 = alpha0
         self.beta0 = beta0
         self.var_eta = var_eta
@@ -244,9 +242,7 @@ def rolling_regression_test(X, Y, rolling_window, training_size):
     return rolling_beta
 
 
-def plot_betas(
-    X, Y, true_rho, rho_err, var_eta=None, training_size=250, rolling_window=50
-):
+def plot_betas(X, Y, true_rho, rho_err, var_eta=None, training_size=250, rolling_window=50):
     """
     This function performs all the calculations necessary for the plot of:
         - Kalman beta
@@ -326,9 +322,7 @@ def plot_betas(
         "MSE Rolling regression: ",
         np.mean((np.array(rolling_beta) - true_rho[training_size + 1 :]) ** 2),
     )
-    print(
-        "MSE Kalman Filter: ", np.mean((betas_KF - true_rho[training_size + 1 :]) ** 2)
-    )
+    print("MSE Kalman Filter: ", np.mean((betas_KF - true_rho[training_size + 1 :]) ** 2))
     print(
         "MSE RTS Smoother: ",
         np.mean((betas_smooth - true_rho[training_size + 1 :]) ** 2),

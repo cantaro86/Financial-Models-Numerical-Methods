@@ -16,9 +16,7 @@ def optimal_weights(MU, COV, Rf=0, w_max=1, desired_mean=None, desired_std=None)
     if (desired_mean is not None) and (desired_std is not None):
         raise ValueError("One among desired_mean and desired_std must be None")
     if ((desired_mean is not None) or (desired_std is not None)) and Rf == 0:
-        raise ValueError(
-            "We just optimize the Sharpe ratio, no computation of efficient frontier"
-        )
+        raise ValueError("We just optimize the Sharpe ratio, no computation of efficient frontier")
 
     N = len(MU)
     bounds = Bounds(0, w_max)

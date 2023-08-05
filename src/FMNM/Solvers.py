@@ -34,9 +34,7 @@ def Thomas(A, b):
     if info == 0:
         return x
     if info > 0:
-        raise LinAlgError(
-            "singular matrix: resolution failed at diagonal %d" % (info - 1)
-        )
+        raise LinAlgError("singular matrix: resolution failed at diagonal %d" % (info - 1))
 
 
 def SOR(A, b, w=1, eps=1e-10, N_max=100):
@@ -66,9 +64,7 @@ def SOR(A, b, w=1, eps=1e-10, N_max=100):
         DD = w * L + D
 
     for i in range(1, N_max + 1):
-        x_new = solve_triangular(
-            DD, (w * b - w * U @ x0 - (w - 1) * D @ x0), lower=True
-        )
+        x_new = solve_triangular(DD, (w * b - w * U @ x0 - (w - 1) * D @ x0), lower=True)
         if norm(x_new - x0) < eps:
             return x_new
         x0 = x_new

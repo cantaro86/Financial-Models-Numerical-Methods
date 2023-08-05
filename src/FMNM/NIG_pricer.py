@@ -45,9 +45,7 @@ class NIG_pricer:
         self.sigma = Process_info.sigma  # NIG parameter
         self.theta = Process_info.theta  # NIG parameter
         self.kappa = Process_info.kappa  # NIG parameter
-        self.exp_RV = (
-            Process_info.exp_RV
-        )  # function to generate exponential NIG Random Variables
+        self.exp_RV = Process_info.exp_RV  # function to generate exponential NIG Random Variables
 
         self.S0 = Option_info.S0  # current price
         self.K = Option_info.K  # strike
@@ -86,16 +84,12 @@ class NIG_pricer:
         )
 
         if self.payoff == "call":
-            call = self.S0 * Q1(k, cf_NIG_b, np.inf) - self.K * np.exp(
-                -self.r * self.T
-            ) * Q2(
+            call = self.S0 * Q1(k, cf_NIG_b, np.inf) - self.K * np.exp(-self.r * self.T) * Q2(
                 k, cf_NIG_b, np.inf
             )  # pricing function
             return call
         elif self.payoff == "put":
-            put = self.K * np.exp(-self.r * self.T) * (
-                1 - Q2(k, cf_NIG_b, np.inf)
-            ) - self.S0 * (
+            put = self.K * np.exp(-self.r * self.T) * (1 - Q2(k, cf_NIG_b, np.inf)) - self.S0 * (
                 1 - Q1(k, cf_NIG_b, np.inf)
             )  # pricing function
             return put
@@ -129,9 +123,7 @@ class NIG_pricer:
     def NIG_measure(self, x):
         A = self.theta / (self.sigma**2)
         B = np.sqrt(self.theta**2 + self.sigma**2 / self.kappa) / self.sigma**2
-        C = np.sqrt(self.theta**2 + self.sigma**2 / self.kappa) / (
-            np.pi * self.sigma * np.sqrt(self.kappa)
-        )
+        C = np.sqrt(self.theta**2 + self.sigma**2 / self.kappa) / (np.pi * self.sigma * np.sqrt(self.kappa))
         return C / np.abs(x) * np.exp(A * (x)) * scps.kv(1, B * np.abs(x))
 
     def PIDE_price(self, steps, Time=False):
@@ -151,15 +143,11 @@ class NIG_pricer:
         x_max = np.log(S_max)
         x_min = np.log(S_min)
 
-        dev_X = np.sqrt(
-            self.sigma**2 + self.theta**2 * self.kappa
-        )  # std dev NIG process
+        dev_X = np.sqrt(self.sigma**2 + self.theta**2 * self.kappa)  # std dev NIG process
 
         dx = (x_max - x_min) / (Nspace - 1)
         extraP = int(np.floor(7 * dev_X / dx))  # extra points beyond the B.C.
-        x = np.linspace(
-            x_min - extraP * dx, x_max + extraP * dx, Nspace + 2 * extraP
-        )  # space discretization
+        x = np.linspace(x_min - extraP * dx, x_max + extraP * dx, Nspace + 2 * extraP)  # space discretization
         t, dt = np.linspace(0, self.T, Ntime, retstep=True)  # time discretization
 
         Payoff = self.payoff_f(np.exp(x))
@@ -168,25 +156,20 @@ class NIG_pricer:
 
         if self.payoff == "call":
             V[:, -1] = Payoff  # terminal conditions
-            V[-extraP - 1 :, :] = np.exp(x[-extraP - 1 :]).reshape(
-                extraP + 1, 1
-            ) * np.ones((extraP + 1, Ntime)) - self.K * np.exp(
-                -self.r * t[::-1]
-            ) * np.ones(
+            V[-extraP - 1 :, :] = np.exp(x[-extraP - 1 :]).reshape(extraP + 1, 1) * np.ones(
+                (extraP + 1, Ntime)
+            ) - self.K * np.exp(-self.r * t[::-1]) * np.ones(
                 (extraP + 1, Ntime)
             )  # boundary condition
             V[: extraP + 1, :] = 0
         else:
             V[:, -1] = Payoff
             V[-extraP - 1 :, :] = 0
-            V[: extraP + 1, :] = (
-                self.K * np.exp(-self.r * t[::-1]) * np.ones((extraP + 1, Ntime))
-            )
+            V[: extraP + 1, :] = self.K * np.exp(-self.r * t[::-1]) * np.ones((extraP + 1, Ntime))
 
         eps = 1.5 * dx  # the cutoff near 0
         lam = (
-            quad(self.NIG_measure, -(extraP + 1.5) * dx, -eps)[0]
-            + quad(self.NIG_measure, eps, (extraP + 1.5) * dx)[0]
+            quad(self.NIG_measure, -(extraP + 1.5) * dx, -eps)[0] + quad(self.NIG_measure, eps, (extraP + 1.5) * dx)[0]
         )  # approximated intensity
 
         def int_w(y):
@@ -195,10 +178,7 @@ class NIG_pricer:
         def int_s(y):
             return y**2 * self.NIG_measure(y)
 
-        w = (
-            quad(int_w, -(extraP + 1.5) * dx, -eps)[0]
-            + quad(int_w, eps, (extraP + 1.5) * dx)[0]
-        )  # is the approx of w
+        w = quad(int_w, -(extraP + 1.5) * dx, -eps)[0] + quad(int_w, eps, (extraP + 1.5) * dx)[0]  # is the approx of w
         sig2 = quad(int_s, -eps, eps, points=0)[0]  # the small jumps variance
 
         dxx = dx * dx
@@ -210,9 +190,7 @@ class NIG_pricer:
 
         nu = np.zeros(2 * extraP + 3)  # Lévy measure vector
         x_med = extraP + 1  # middle point in nu vector
-        x_nu = np.linspace(
-            -(extraP + 1 + 0.5) * dx, (extraP + 1 + 0.5) * dx, 2 * (extraP + 2)
-        )  # integration domain
+        x_nu = np.linspace(-(extraP + 1 + 0.5) * dx, (extraP + 1 + 0.5) * dx, 2 * (extraP + 2))  # integration domain
         for i in range(len(nu)):
             if (i == x_med) or (i == x_med - 1) or (i == x_med + 1):
                 continue
@@ -234,9 +212,7 @@ class NIG_pricer:
                 V_jump = V[extraP + 1 : -extraP - 1, i + 1] + dt * signal.convolve(
                     V[:, i + 1], nu[::-1], mode="valid", method="auto"
                 )
-                V[extraP + 1 : -extraP - 1, i] = np.maximum(
-                    DD.solve(V_jump - offset), Payoff[extraP + 1 : -extraP - 1]
-                )
+                V[extraP + 1 : -extraP - 1, i] = np.maximum(DD.solve(V_jump - offset), Payoff[extraP + 1 : -extraP - 1])
 
         X0 = np.log(self.S0)  # current log-price
         self.S_vec = np.exp(x[extraP + 1 : -extraP - 1])  # vector of S

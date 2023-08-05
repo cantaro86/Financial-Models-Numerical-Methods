@@ -89,21 +89,13 @@ class BS_pricer:
         """
         Black Scholes closed formula:
         """
-        d1 = (np.log(self.S0 / self.K) + (self.r + self.sig**2 / 2) * self.T) / (
-            self.sig * np.sqrt(self.T)
-        )
-        d2 = (np.log(self.S0 / self.K) + (self.r - self.sig**2 / 2) * self.T) / (
-            self.sig * np.sqrt(self.T)
-        )
+        d1 = (np.log(self.S0 / self.K) + (self.r + self.sig**2 / 2) * self.T) / (self.sig * np.sqrt(self.T))
+        d2 = (np.log(self.S0 / self.K) + (self.r - self.sig**2 / 2) * self.T) / (self.sig * np.sqrt(self.T))
 
         if self.payoff == "call":
-            return self.S0 * ss.norm.cdf(d1) - self.K * np.exp(
-                -self.r * self.T
-            ) * ss.norm.cdf(d2)
+            return self.S0 * ss.norm.cdf(d1) - self.K * np.exp(-self.r * self.T) * ss.norm.cdf(d2)
         elif self.payoff == "put":
-            return self.K * np.exp(-self.r * self.T) * ss.norm.cdf(
-                -d2
-            ) - self.S0 * ss.norm.cdf(-d1)
+            return self.K * np.exp(-self.r * self.T) * ss.norm.cdf(-d2) - self.S0 * ss.norm.cdf(-d1)
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
 
@@ -119,16 +111,12 @@ class BS_pricer:
         )  # function binding
 
         if self.payoff == "call":
-            call = self.S0 * Q1(k, cf_GBM, np.inf) - self.K * np.exp(
-                -self.r * self.T
-            ) * Q2(
+            call = self.S0 * Q1(k, cf_GBM, np.inf) - self.K * np.exp(-self.r * self.T) * Q2(
                 k, cf_GBM, np.inf
             )  # pricing function
             return call
         elif self.payoff == "put":
-            put = self.K * np.exp(-self.r * self.T) * (
-                1 - Q2(k, cf_GBM, np.inf)
-            ) - self.S0 * (
+            put = self.K * np.exp(-self.r * self.T) * (1 - Q2(k, cf_GBM, np.inf)) - self.S0 * (
                 1 - Q1(k, cf_GBM, np.inf)
             )  # pricing function
             return put
@@ -150,9 +138,7 @@ class BS_pricer:
             return fft_Lewis(K, self.S0, self.r, self.T, cf_GBM, interp="cubic")
         elif self.payoff == "put":  # put-call parity
             return (
-                fft_Lewis(K, self.S0, self.r, self.T, cf_GBM, interp="cubic")
-                - self.S0
-                + K * np.exp(-self.r * self.T)
+                fft_Lewis(K, self.S0, self.r, self.T, cf_GBM, interp="cubic") - self.S0 + K * np.exp(-self.r * self.T)
             )
         else:
             raise ValueError("invalid type. Set 'call' or 'put'")
@@ -230,9 +216,7 @@ class BS_pricer:
         else:
             V[:, -1] = Payoff
             V[-1, :] = 0
-            V[0, :] = Payoff[0] * np.exp(
-                -self.r * t[::-1]
-            )  # Instead of Payoff[0] I could use K
+            V[0, :] = Payoff[0] * np.exp(-self.r * t[::-1])  # Instead of Payoff[0] I could use K
             # For s to 0, the limiting value is e^(-rT)(K-s)
 
         sig2 = self.sig**2
@@ -255,9 +239,7 @@ class BS_pricer:
                 for i in range(Ntime - 2, -1, -1):
                     offset[0] = a * V[0, i]
                     offset[-1] = c * V[-1, i]
-                    V[1:-1, i] = np.maximum(
-                        spsolve(D, (V[1:-1, i + 1] - offset)), Payoff[1:-1]
-                    )
+                    V[1:-1, i] = np.maximum(spsolve(D, (V[1:-1, i + 1] - offset)), Payoff[1:-1])
         elif solver == "Thomas":
             if self.exercise == "European":
                 for i in range(Ntime - 2, -1, -1):
@@ -268,17 +250,13 @@ class BS_pricer:
                 for i in range(Ntime - 2, -1, -1):
                     offset[0] = a * V[0, i]
                     offset[-1] = c * V[-1, i]
-                    V[1:-1, i] = np.maximum(
-                        Thomas(D, (V[1:-1, i + 1] - offset)), Payoff[1:-1]
-                    )
+                    V[1:-1, i] = np.maximum(Thomas(D, (V[1:-1, i + 1] - offset)), Payoff[1:-1])
         elif solver == "SOR":
             if self.exercise == "European":
                 for i in range(Ntime - 2, -1, -1):
                     offset[0] = a * V[0, i]
                     offset[-1] = c * V[-1, i]
-                    V[1:-1, i] = SOR(
-                        a, b, c, (V[1:-1, i + 1] - offset), w=1.68, eps=1e-10, N_max=600
-                    )
+                    V[1:-1, i] = SOR(a, b, c, (V[1:-1, i + 1] - offset), w=1.68, eps=1e-10, N_max=600)
             elif self.exercise == "American":
                 for i in range(Ntime - 2, -1, -1):
                     offset[0] = a * V[0, i]
@@ -306,9 +284,7 @@ class BS_pricer:
                 for i in range(Ntime - 2, -1, -1):
                     offset[0] = a * V[0, i]
                     offset[-1] = c * V[-1, i]
-                    V[1:-1, i] = np.maximum(
-                        DD.solve(V[1:-1, i + 1] - offset), Payoff[1:-1]
-                    )
+                    V[1:-1, i] = np.maximum(DD.solve(V[1:-1, i + 1] - offset), Payoff[1:-1])
         else:
             raise ValueError("Solver is splu, spsolve, SOR or Thomas")
 
@@ -385,9 +361,7 @@ class BS_pricer:
         # Valuation by LS Method
         for t in range(N - 2, 0, -1):
             good_paths = H[:, t] > 0
-            rg = np.polyfit(
-                S[good_paths, t], V[good_paths, t + 1] * df, 2
-            )  # polynomial regression
+            rg = np.polyfit(S[good_paths, t], V[good_paths, t + 1] * df, 2)  # polynomial regression
             C = np.polyval(rg, S[good_paths, t])  # evaluation of regression
 
             exercise = np.zeros(len(good_paths), dtype=bool)
