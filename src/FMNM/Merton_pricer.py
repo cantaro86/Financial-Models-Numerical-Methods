@@ -15,12 +15,12 @@ import scipy.stats as ss
 from scipy import signal
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from src.FMNM.BS_pricer import BS_pricer
+from FMNM.BS_pricer import BS_pricer
 from math import factorial
-from src.FMNM.CF import cf_mert
-from src.FMNM.probabilities import Q1, Q2
+from FMNM.CF import cf_mert
+from FMNM.probabilities import Q1, Q2
 from functools import partial
-from src.FMNM.FFT import fft_Lewis, IV_from_Lewis
+from FMNM.FFT import fft_Lewis, IV_from_Lewis
 
 
 class Merton_pricer:

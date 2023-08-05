@@ -18,8 +18,8 @@ import scipy.special as scps
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from src.FMNM.CF import cf_NIG
-from src.FMNM.probabilities import Q1, Q2
+from FMNM.CF import cf_NIG
+from FMNM.probabilities import Q1, Q2
 from functools import partial
 
 

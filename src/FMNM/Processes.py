@@ -8,7 +8,7 @@ Created on Sat Jul 27 17:06:01 2019
 
 import numpy as np
 import scipy.stats as ss
-from src.FMNM.probabilities import VG_pdf
+from FMNM.probabilities import VG_pdf
 from scipy.optimize import minimize
 from statsmodels.tools.numdiff import approx_hess
 import pandas as pd

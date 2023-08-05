@@ -23,4 +23,5 @@ src/FMNM/cython/__pycache__/
 src/C/*.o
 src/FMNM/FMNM.egg-info
 src/FMNM.egg-info
-src/*.so
+src/FMNM/cython/*.so
+src/FMNM/cython/*.c

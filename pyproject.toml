@@ -16,8 +16,7 @@ dependencies = {file = ["list_of_packages.txt"]}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["FMNM*"]  
-exclude = ["C*"]
+namespaces = false  # prevent folders without __init__.py from being scanned
 
 [project.urls]
 "Homepage" = "https://github.com/cantaro86/Financial-Models-Numerical-Methods"
