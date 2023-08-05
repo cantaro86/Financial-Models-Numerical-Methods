@@ -27,7 +27,7 @@ defusedxml==0.7.1
 ecos==2.0.12
 executing==1.2.0
 fastjsonschema==2.18.0
-flake8==6.0.0
+flake8==6.1.0
 fonttools==4.41.1
 fqdn==1.5.1
 idna==3.4

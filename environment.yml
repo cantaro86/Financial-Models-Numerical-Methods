@@ -1,6 +1,5 @@
 name: FMNM
 channels:
-  - anaconda
   - conda-forge
   - defaults
 dependencies:
@@ -24,8 +23,8 @@ dependencies:
   - brotli-bin=1.0.9=h1a8c8d9_9
   - brotli-python=1.0.9=py311ha397e9f_9
   - bzip2=1.0.8=h3422bc3_4
-  - ca-certificates=2022.4.26=hca03da5_0
-  - certifi=2020.6.20=pyhd3eb1b0_3
+  - ca-certificates=2023.7.22=hf0a4a13_0
+  - certifi=2023.7.22=pyhd8ed1ab_0
   - cffi=1.15.1=py311hae827db_3
   - charset-normalizer=3.2.0=pyhd8ed1ab_0
   - click=8.1.6=unix_pyh707e725_0
@@ -42,7 +41,7 @@ dependencies:
   - entrypoints=0.4=pyhd8ed1ab_0
   - exceptiongroup=1.1.2=pyhd8ed1ab_0
   - executing=1.2.0=pyhd8ed1ab_0
-  - flake8=4.0.1=pyhd3eb1b0_1
+  - flake8=6.1.0=pyhd8ed1ab_0
   - flit-core=3.9.0=pyhd8ed1ab_0
   - fonttools=4.41.1=py311heffc1b2_0
   - freetype=2.12.1=hd633e50_1
@@ -104,7 +103,7 @@ dependencies:
   - matplotlib=3.7.2=py311ha1ab1f8_0
   - matplotlib-base=3.7.2=py311h3bc9839_0
   - matplotlib-inline=0.1.6=pyhd8ed1ab_0
-  - mccabe=0.7.0=pyhd3eb1b0_0
+  - mccabe=0.7.0=pyhd8ed1ab_0
   - mistune=3.0.0=pyhd8ed1ab_0
   - mpc=1.3.1=h91ba8db_0
   - mpfr=4.2.0=he09a6ba_0
@@ -122,7 +121,7 @@ dependencies:
   - notebook-shim=0.2.3=pyhd8ed1ab_0
   - numpy=1.25.1=py311hb8f3215_0
   - openjpeg=2.5.0=hbc2ba62_2
-  - openssl=3.1.1=h53f4e23_1
+  - openssl=3.1.2=h53f4e23_0
   - osqp=0.6.3=py311h9e438b8_1
   - overrides=7.3.1=pyhd8ed1ab_0
   - packaging=23.1=pyhd8ed1ab_0
@@ -130,7 +129,7 @@ dependencies:
   - pandoc=3.1.3=hce30654_0
   - pandocfilters=1.5.0=pyhd8ed1ab_0
   - parso=0.8.3=pyhd8ed1ab_0
-  - pathspec=0.11.1=pyhd8ed1ab_0
+  - pathspec=0.11.2=pyhd8ed1ab_0
   - patsy=0.5.3=pyhd8ed1ab_0
   - pexpect=4.8.0=pyh1a96a4e_2
   - pickleshare=0.7.5=py_1003
@@ -146,9 +145,9 @@ dependencies:
   - pthread-stubs=0.4=h27ca646_1001
   - ptyprocess=0.7.0=pyhd3deb0d_0
   - pure_eval=0.2.2=pyhd8ed1ab_0
-  - pycodestyle=2.8.0=pyhd3eb1b0_0
+  - pycodestyle=2.11.0=pyhd8ed1ab_0
   - pycparser=2.21=pyhd8ed1ab_0
-  - pyflakes=2.4.0=pyhd3eb1b0_0
+  - pyflakes=3.1.0=pyhd8ed1ab_0
   - pygments=2.15.1=pyhd8ed1ab_0
   - pyobjc-core=9.2=py311hb702dc4_0
   - pyobjc-framework-cocoa=9.2=py311hb702dc4_0
@@ -185,7 +184,7 @@ dependencies:
   - threadpoolctl=3.2.0=pyha21a80b_0
   - tinycss2=1.2.1=pyhd8ed1ab_0
   - tk=8.6.12=he1e0b03_0
-  - tokenize-rt=5.1.0=pyhd8ed1ab_0
+  - tokenize-rt=5.2.0=pyhd8ed1ab_0
   - tomli=2.0.1=pyhd8ed1ab_0
   - tornado=6.3.2=py311heffc1b2_0
   - traitlets=5.9.0=pyhd8ed1ab_0
