@@ -172,6 +172,8 @@ dependencies:
   - scikit-learn=1.3.0=py311hf0b18b8_0
   - scipy=1.11.1=py311h93d07a4_0
   - scs=3.2.3=py311h0dc035f_0
+  - seaborn=0.12.2=hd8ed1ab_0
+  - seaborn-base=0.12.2=pyhd8ed1ab_0
   - send2trash=1.8.2=pyhd1c38e8_0
   - setuptools=68.0.0=pyhd8ed1ab_0
   - six=1.16.0=pyh6c4a22f_0
