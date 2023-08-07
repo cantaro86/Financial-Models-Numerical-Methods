@@ -305,7 +305,7 @@ def plot_betas(X, Y, true_rho, rho_err, var_eta=None, training_size=250, rolling
         linestyle="None",
         label="rho with model error",
     )
-    plt.plot(true_rho[training_size + 1 :], color="black", alpha=2, label="True rho")
+    plt.plot(true_rho[training_size + 1 :], color="black", alpha=1, label="True rho")
     plt.fill_between(
         x=range(len(betas_KF)),
         y1=betas_KF + np.sqrt(Ps_KF),
