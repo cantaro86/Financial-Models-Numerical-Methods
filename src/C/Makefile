@@ -1,10 +1,10 @@
 PROGRAM_NAME=BS_sor
 OBJECTS=BS_SOR_main.o SOR.o PDE_solver.o       
 
-CXX=gcc #clang
+CXX=clang #gcc
 
 
-CXXFLAGS +=-Wall -Werror
+CXXFLAGS +=-Wall -Werror -O2
 LIBS=-lm                  
 
 
