@@ -8,7 +8,7 @@ version = "1.0.0"
 authors = [{ name = "cantaro86", email = "nicolacantarutti@gmail.com" }]
 description = "Library for the code used in the FMNM notebooks."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
