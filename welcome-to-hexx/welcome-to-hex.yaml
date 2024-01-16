@@ -1,0 +1,191 @@
+schemaVersion: 3
+meta:
+  sourceVersionId: 869fbf42-5731-461f-8e97-7987fa3b2ccf # DO NOT CHANGE - Hex uses this to match up project versions when reimporting the file
+  description: "Get started with this example project that uses SQL and Python to find the most popular dessert order for a fictional dumpling restaurant. "
+  projectId: e8d090d2-62bc-468b-855b-081c162d7ca0 # DO NOT CHANGE - Unique ID of the project from which this file was generated
+  title: Welcome to Hex!
+  timezone: null
+  appTheme: SYS_PREF
+  codeLanguage: PYTHON
+  status: null
+  categories: []
+  castDecimalsDefault: true
+  logicQueryCacheTimeout: null
+  publishedQueryCacheTimeout: null
+projectAssets:
+  dataConnections: []
+  envVars: []
+  secrets: []
+sharedAssets:
+  secrets: []
+  vcsPackages: []
+  dataConnections:
+    - dataConnectionId: 22c1d118-20ef-4485-8744-4c4ba2c84e6d # [Demo] Hex Public Data (snowflake)
+  externalFileIntegrations: []
+cells:
+  - cellType: SQL
+    cellId: 73f3450d-989f-460a-b378-4c2116756988 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Orders
+    config:
+      source: |-
+        -- Use SQL to get all food orders from a demo data warehouse
+        select * from prod.order_details
+      dataFrameCell: false
+      dataConnectionId: 22c1d118-20ef-4485-8744-4c4ba2c84e6d
+      resultVariableName: orders
+      useRichDisplay: false
+      sqlCellOutputType: PANDAS
+      useQueryMode: false
+      castDecimals: true
+      useNativeDates: true
+      outputFilteredResult: true
+      allowDuplicateColumns: false
+      tableDisplayConfig: null
+  - cellType: TEXT
+    cellId: f6c7501c-2273-4207-89fc-64f47d2b6260 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      richText:
+        - type: h3
+          children:
+            - text: What's our most popular dessert?
+        - type: p
+          children:
+            - text: Let's use some Python to analyze our above SQL result.
+              italic: true
+  - cellType: CODE
+    cellId: 90d8840f-cc4e-48ef-8e05-2fd9b24f8e18 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      source: |-
+        only_sweets = orders[orders["CATEGORY"] == "Sweets"]
+        popular_dessert = only_sweets["MENU_ITEM"].mode()[0]
+        print(f"The most popular dessert is the {popular_dessert}")
+  - cellType: TEXT
+    cellId: 0db6b8f2-8ce8-4aec-972f-bd1f6547e2aa # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      richText:
+        - type: h3
+          children:
+            - text: What are our most popular desserts over time?
+        - type: p
+          children:
+            - text: We can find out by using a chart cell to filter, aggregate, and display data.
+              italic: true
+  - cellType: CHARTV2
+    cellId: 68a92460-83f5-4fff-a9e6-44628b1ceaee # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      height: null
+      chartSpec:
+        type: layered
+        layers:
+          - id: 13143c7a-497f-4e18-bb13-61b187429866
+            xAxis:
+              type: datetime
+              style:
+                grid:
+                  style: solid
+                ticks: {}
+                labels: {}
+              timeUnit: year
+              dataFrameColumn: ORDERED_AT
+            series:
+              - id: b9d6c7f4-dbc5-43d4-829e-d815f1bac712
+                type: bar
+                axis:
+                  type: number
+                  style:
+                    grid:
+                      style: solid
+                    ticks: {}
+                    labels: {}
+                  aggregate: count
+                dataFrameColumns:
+                  - ORDER_ITEM_ID
+                colorDataFrameColumn: MENU_ITEM
+                colorOrder: ascending
+                color:
+                  type: series
+                  colorsBySeriesValues: {}
+                opacity:
+                  type: static
+                  value: 1
+                tooltip:
+                  type: auto
+                barWidth: 1
+                orientation: vertical
+                layout: grouped
+            dataFrame: orders
+        settings:
+          legend:
+            position: right
+          tooltip: true
+          selectionEnabled: false
+      chartSelection: {}
+      colorMappings:
+        Egg Yolk Bun: "#F58518"
+        Sesame Balls: "#54A24B"
+        Trio of Buns: "#EECA3B"
+        Mango Pudding: "#72B7B2"
+        Beet & Taro Bun: "#4C78A8"
+        Green Tea & Milk Bun: "#E45756"
+      resultVariable: filter_result
+      outputResult: true
+      displayTableConfig:
+        pageSize: 50
+        height: null
+        hideIcons: false
+        hideIndex: false
+        defaultSortColumn: null
+        defaultSortIndexColumn: null
+        defaultSortDirection: ASC
+        conditionalFormatting: null
+        filters:
+          - column: CATEGORY
+            predicate:
+              op: EQ
+              arg: Sweets
+            columnType: STRING
+        columnProperties: []
+        columnOrdering: null
+        pinnedColumns: []
+        hiddenColumns: null
+appLayout:
+  visibleMetadataFields:
+    - NAME
+    - DESCRIPTION
+    - AUTHOR
+    - LAST_EDITED
+    - LAST_RUN
+    - CATEGORIES
+    - STATUS
+    - TABLE_OF_CONTENTS
+  fullWidth: false
+  tabs:
+    - name: Tab 1
+      rows:
+        - columns:
+            - start: 0
+              end: 120
+              elements:
+                - showSource: false
+                  hideOutput: false
+                  type: CELL
+                  cellId: 73f3450d-989f-460a-b378-4c2116756988
+                  sharedFilterId: null
+                  height: null
+                  showLabel: true
+        - columns:
+            - start: 0
+              end: 120
+              elements:
+                - showSource: false
+                  hideOutput: false
+                  type: CELL
+                  cellId: 68a92460-83f5-4fff-a9e6-44628b1ceaee
+                  sharedFilterId: null
+                  height: null
+                  showLabel: true
+sharedFilters: []
