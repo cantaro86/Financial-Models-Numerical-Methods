@@ -432,20 +432,20 @@ class OU_process:
 
     def path(self, X0=0, T=1, N=10000, paths=1):
         """
-        Produces a matrix of OU process:  X[paths,N]
+        Produces a matrix of OU process:  X[N, paths]
         X0 = starting point
-        N = number of time steps
+        N = number of time points (there are N-1 time steps)
         T = Time in years
         paths = number of paths
         """
 
-        T_vec, dt = np.linspace(0, T, N, retstep=True)
-        X = np.zeros((paths, N))
-        X[:, 0] = X0
-        W = ss.norm.rvs(loc=0, scale=1, size=(paths, N - 1))
+        dt = T / (N - 1)
+        X = np.zeros((N, paths))
+        X[0, :] = X0
+        W = ss.norm.rvs(loc=0, scale=1, size=(N - 1, paths))
 
         std_dt = np.sqrt(self.sigma**2 / (2 * self.kappa) * (1 - np.exp(-2 * self.kappa * dt)))
         for t in range(0, N - 1):
-            X[:, t + 1] = self.theta + np.exp(-self.kappa * dt) * (X[:, t] - self.theta) + std_dt * W[:, t]
+            X[t + 1, :] = self.theta + np.exp(-self.kappa * dt) * (X[t, :] - self.theta) + std_dt * W[t, :]
 
         return X
