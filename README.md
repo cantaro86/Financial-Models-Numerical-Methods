@@ -131,6 +131,7 @@ A.3) **Appendix: Review of Lévy processes theory**
 
 
 **Virtual environment:**
+
 Here I explain how to create a virtual environment with [Anaconda](https://www.anaconda.com/distribution/) and with the python module [venv](https://docs.python.org/3.7/tutorial/venv.html). 
 
 - Option 1:
@@ -180,13 +181,38 @@ pip install --requirement list_of_packages.txt
 pip install -e .
 ```     
 
-and then enter in the shell:
-
-```bash
-jupyter-notebook
-```
+and then enter in the shell `jupyter-notebook` or `jupyter-lab`:
 
 
 However, if you are using old versions, there could be compatibility problems.
+
+**Docker:**
+
+Here we run the notebooks with jupyterlab:
+
+- Option 1:
+
+You can use docker-compose to build a container:
+
+```bash
+docker-compose up --build -d
+```
+
+And then stop the container with
+
+```bash
+docker-compose down
+```
+
+And open the browser at `http://localhost:8888/lab`
+
+- Option 2:
+
+Alternatively, you can
+
+```bash
+docker build -t fmnm .
+docker run --rm -d -p 8888:8888 --name Numeric_Finance fmnm
+```
 
 ### Enjoy!
