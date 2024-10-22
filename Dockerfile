@@ -24,6 +24,9 @@ RUN git clone https://github.com/cantaro86/Financial-Models-Numerical-Methods.gi
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --requirement requirements.txt
 
+# Old style jupyter notebooks
+RUN pip install nbclassic
+
 # Install local package
 RUN pip install .
 
@@ -31,7 +34,7 @@ RUN pip install .
 EXPOSE 8888
 
 # Start Jupyter Notebook server
-CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+CMD ["jupyter", "nbclassic", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
 
 
 #################################################################
@@ -43,6 +46,8 @@ CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-r
 # docker run --rm -d -p 8888:8888 --name Numeric_Finance fmnm
 
 # 3. OPEN IN BROWSER 
+# http://localhost:8888/lab
+# or
 # http://localhost:8888/lab
 
 # OR 

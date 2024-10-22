@@ -8,5 +8,5 @@ services:
       - "8888:8888"
     volumes:
       - .:/workspace
-    command: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+    command: ["jupyter", "nbclassic", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
     container_name: Numeric_Finance
