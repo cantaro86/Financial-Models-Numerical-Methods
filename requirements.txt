@@ -80,7 +80,7 @@ pathspec==0.11.1
 patsy==0.5.3
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==10.0.0
+Pillow==10.0.1
 platformdirs==3.9.1
 prometheus-client==0.17.1
 prompt-toolkit==3.0.39
