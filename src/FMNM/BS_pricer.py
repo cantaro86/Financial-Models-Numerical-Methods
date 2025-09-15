@@ -168,7 +168,7 @@ class BS_pricer:
 
         S_T = self.exp_RV(self.S0, self.T, N)
         PayOff = self.payoff_f(S_T)
-        V = scp.mean(np.exp(-self.r * self.T) * PayOff, axis=0)
+        V = np.mean(np.exp(-self.r * self.T) * PayOff, axis=0)
 
         if Err is True:
             if Time is True:
