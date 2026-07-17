@@ -10,7 +10,7 @@ import numpy as np
 from scipy import sparse
 from scipy.linalg import norm, solve_triangular
 from scipy.linalg.lapack import get_lapack_funcs
-from scipy.linalg.misc import LinAlgError
+from scipy.linalg import LinAlgError
 
 
 def Thomas(A, b):

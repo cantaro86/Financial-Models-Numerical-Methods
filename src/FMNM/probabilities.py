@@ -16,12 +16,14 @@ from math import factorial
 
 def Q1(k, cf, right_lim):
     """
-    P(X<k) - Probability to be in the money under the stock numeraire.
+    P(X>k) - Probability to be in the money under the stock numeraire.
     cf: characteristic function
     right_lim: right limit of integration
     """
 
     def integrand(u):
+        # cf(-1.0000000000001j) approximates cf(-1j) (i.e. cf(-i), the martingale
+        # normalizer E[e^X]); the small offset avoids a potential singularity at -1j.
         return np.real((np.exp(-u * k * 1j) / (u * 1j)) * cf(u - 1j) / cf(-1.0000000000001j))
 
     return 1 / 2 + 1 / np.pi * quad(integrand, 1e-15, right_lim, limit=2000)[0]
@@ -29,7 +31,7 @@ def Q1(k, cf, right_lim):
 
 def Q2(k, cf, right_lim):
     """
-    P(X<k) - Probability to be in the money under the money market numeraire
+    P(X>k) - Probability to be in the money under the money market numeraire
     cf: characteristic function
     right_lim: right limit of integration
     """

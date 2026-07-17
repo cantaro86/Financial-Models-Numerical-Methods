@@ -8,7 +8,6 @@ Created on Sun Apr 19 12:13:10 2020
 
 from time import time
 import numpy as np
-import scipy as scp
 import scipy.stats as ss
 
 from FMNM.CF import cf_Heston_good
@@ -78,7 +77,7 @@ class Heston_pricer:
         )
         S_T = S_T.reshape((paths, 1))
         DiscountedPayoff = np.exp(-self.r * self.T) * self.payoff_f(S_T)
-        V = scp.mean(DiscountedPayoff, axis=0)
+        V = np.mean(DiscountedPayoff, axis=0)
         std_err = ss.sem(DiscountedPayoff)
 
         if Err is True:
