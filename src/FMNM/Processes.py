@@ -59,7 +59,7 @@ class Merton_process:
         # moments
         self.var = self.sig**2 + self.lam * self.sigJ**2 + self.lam * self.muJ**2
         self.skew = self.lam * (3 * self.sigJ**2 * self.muJ + self.muJ**3) / self.var ** (1.5)
-        self.kurt = self.lam * (3 * self.sigJ**3 + 6 * self.sigJ**2 * self.muJ**2 + self.muJ**4) / self.var**2
+        self.kurt = self.lam * (3 * self.sigJ**4 + 6 * self.sigJ**2 * self.muJ**2 + self.muJ**4) / self.var**2
 
     def exp_RV(self, S0, T, N):
         m = self.lam * (np.exp(self.muJ + (self.sigJ**2) / 2) - 1)  # coefficient m
@@ -176,7 +176,7 @@ class VG_process:
                 tol=1e-8,
             )
             print(result.message)
-        elif "MM":
+        elif method == "MM":
             self.c, self.theta, self.sigma, self.kappa = (
                 c_mm,
                 theta_mm,
@@ -184,6 +184,8 @@ class VG_process:
                 kappa_mm,
             )
             return
+        else:
+            raise ValueError(f"unknown method {method}. Use 'L-BFGS-B', 'Nelder-Mead' or 'MM'")
         self.c, self.theta, self.sigma, self.kappa = result.x
 
 
@@ -349,7 +351,7 @@ class GARCH:
             log_lik = 0
             for i in range(1, N):
                 var = x[0] + x[1] * R[i - 1] ** 2 + x[2] * var  # variance update
-                log_lik += -np.log(var) - (R[i] ** 2 / var)
+                log_lik += -0.5 * (np.log(var) + (R[i] ** 2 / var))
             return (-1) * log_lik
 
         result = minimize(

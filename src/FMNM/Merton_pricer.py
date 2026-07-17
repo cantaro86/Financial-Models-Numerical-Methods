@@ -10,7 +10,6 @@ from scipy import sparse
 from scipy.sparse.linalg import splu
 from time import time
 import numpy as np
-import scipy as scp
 import scipy.stats as ss
 from scipy import signal
 import matplotlib.pyplot as plt
@@ -171,7 +170,7 @@ class Merton_pricer:
         t_init = time()
 
         S_T = self.exp_RV(self.S0, self.T, N)
-        V = scp.mean(np.exp(-self.r * self.T) * self.payoff_f(S_T), axis=0)
+        V = np.mean(np.exp(-self.r * self.T) * self.payoff_f(S_T), axis=0)
 
         if Err is True:
             if Time is True:
@@ -290,7 +289,7 @@ class Merton_pricer:
 
     def mesh_plt(self):
         if type(self.S_vec) != np.ndarray or type(self.mesh) != np.ndarray:
-            self.PDE_price((7000, 5000))
+            self.PIDE_price((7000, 5000))
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection="3d")

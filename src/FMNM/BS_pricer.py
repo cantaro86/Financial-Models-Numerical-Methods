@@ -7,7 +7,6 @@ Created on Thu Jun 13 10:18:39 2019
 """
 
 import numpy as np
-import scipy as scp
 from scipy.sparse.linalg import spsolve
 from scipy import sparse
 from scipy.sparse.linalg import splu
@@ -168,7 +167,7 @@ class BS_pricer:
 
         S_T = self.exp_RV(self.S0, self.T, N)
         PayOff = self.payoff_f(S_T)
-        V = scp.mean(np.exp(-self.r * self.T) * PayOff, axis=0)
+        V = np.mean(np.exp(-self.r * self.T) * PayOff, axis=0)
 
         if Err is True:
             if Time is True:
@@ -340,7 +339,7 @@ class BS_pricer:
         """
 
         if self.payoff != "put":
-            raise ValueError("invalid type. Set 'call' or 'put'")
+            raise ValueError("LSM is only implemented for put options")
 
         dt = self.T / (N - 1)  # time interval
         df = np.exp(-self.r * dt)  # discount factor per time time interval
@@ -361,7 +360,7 @@ class BS_pricer:
         # Valuation by LS Method
         for t in range(N - 2, 0, -1):
             good_paths = H[:, t] > 0
-            rg = np.polyfit(S[good_paths, t], V[good_paths, t + 1] * df, 2)  # polynomial regression
+            rg = np.polyfit(S[good_paths, t], V[good_paths, t + 1] * df, order)  # polynomial regression
             C = np.polyval(rg, S[good_paths, t])  # evaluation of regression
 
             exercise = np.zeros(len(good_paths), dtype=bool)
