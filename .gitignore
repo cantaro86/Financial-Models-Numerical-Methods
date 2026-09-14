@@ -7,6 +7,9 @@
 *.mtc*
 *.out
 *backup
+*.gz
+*.fls
+*.fdb_latexmk
 
 *.sty
 *.png
@@ -15,6 +18,7 @@
 .DS_Store
 
 .ipynb_checkpoints
+.vscode
 temp
 build
 python-venv

@@ -10,7 +10,6 @@ from scipy import sparse
 from scipy.sparse.linalg import splu
 from time import time
 import numpy as np
-import scipy as scp
 from scipy import signal
 from scipy.integrate import quad
 import scipy.stats as ss
@@ -30,7 +29,7 @@ class NIG_pricer:
     Finite-difference PIDE: Explicit-implicit scheme, with Brownian approximation
 
         0 = dV/dt + (r -(1/2)sig^2 -w) dV/dx + (1/2)sig^2 d^V/dx^2
-                 + \int[ V(x+y) nu(dy) ] -(r+lam)V
+                 + \\int[ V(x+y) nu(dy) ] -(r+lam)V
     """
 
     def __init__(self, Option_info, Process_info):
@@ -105,7 +104,7 @@ class NIG_pricer:
         t_init = time()
 
         S_T = self.exp_RV(self.S0, self.T, N)
-        V = scp.mean(np.exp(-self.r * self.T) * self.payoff_f(S_T))
+        V = np.mean(np.exp(-self.r * self.T) * self.payoff_f(S_T))
 
         if Err is True:
             if Time is True:
@@ -227,12 +226,12 @@ class NIG_pricer:
             return self.price
 
     def plot(self, axis=None):
-        if type(self.S_vec) != np.ndarray or type(self.price_vec) != np.ndarray:
+        if not isinstance(self.S_vec, np.ndarray) or not isinstance(self.price_vec, np.ndarray):
             self.PIDE_price((5000, 4000))
 
         plt.plot(self.S_vec, self.payoff_f(self.S_vec), color="blue", label="Payoff")
         plt.plot(self.S_vec, self.price_vec, color="red", label="NIG curve")
-        if type(axis) == list:
+        if isinstance(axis, list):
             plt.axis(axis)
         plt.xlabel("S")
         plt.ylabel("price")
@@ -241,8 +240,8 @@ class NIG_pricer:
         plt.show()
 
     def mesh_plt(self):
-        if type(self.S_vec) != np.ndarray or type(self.mesh) != np.ndarray:
-            self.PDE_price((7000, 5000))
+        if not isinstance(self.S_vec, np.ndarray) or not isinstance(self.mesh, np.ndarray):
+            self.PIDE_price((7000, 5000))
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection="3d")

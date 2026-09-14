@@ -7,7 +7,6 @@ Created on Thu Jun 13 10:18:39 2019
 """
 
 import numpy as np
-import scipy as scp
 from scipy.sparse.linalg import spsolve
 from scipy import sparse
 from scipy.sparse.linalg import splu
@@ -168,7 +167,7 @@ class BS_pricer:
 
         S_T = self.exp_RV(self.S0, self.T, N)
         PayOff = self.payoff_f(S_T)
-        V = scp.mean(np.exp(-self.r * self.T) * PayOff, axis=0)
+        V = np.mean(np.exp(-self.r * self.T) * PayOff, axis=0)
 
         if Err is True:
             if Time is True:
@@ -299,14 +298,14 @@ class BS_pricer:
             return self.price
 
     def plot(self, axis=None):
-        if type(self.S_vec) != np.ndarray or type(self.price_vec) != np.ndarray:
+        if not isinstance(self.S_vec, np.ndarray) or not isinstance(self.price_vec, np.ndarray):
             self.PDE_price((7000, 5000))
             # print("run the PDE_price method")
             # return
 
         plt.plot(self.S_vec, self.payoff_f(self.S_vec), color="blue", label="Payoff")
         plt.plot(self.S_vec, self.price_vec, color="red", label="BS curve")
-        if type(axis) == list:
+        if isinstance(axis, list):
             plt.axis(axis)
         plt.xlabel("S")
         plt.ylabel("price")
@@ -315,7 +314,7 @@ class BS_pricer:
         plt.show()
 
     def mesh_plt(self):
-        if type(self.S_vec) != np.ndarray or type(self.mesh) != np.ndarray:
+        if not isinstance(self.S_vec, np.ndarray) or not isinstance(self.mesh, np.ndarray):
             self.PDE_price((7000, 5000))
 
         fig = plt.figure()
@@ -340,7 +339,7 @@ class BS_pricer:
         """
 
         if self.payoff != "put":
-            raise ValueError("invalid type. Set 'call' or 'put'")
+            raise ValueError("LSM is only implemented for put options")
 
         dt = self.T / (N - 1)  # time interval
         df = np.exp(-self.r * dt)  # discount factor per time time interval
@@ -361,7 +360,7 @@ class BS_pricer:
         # Valuation by LS Method
         for t in range(N - 2, 0, -1):
             good_paths = H[:, t] > 0
-            rg = np.polyfit(S[good_paths, t], V[good_paths, t + 1] * df, 2)  # polynomial regression
+            rg = np.polyfit(S[good_paths, t], V[good_paths, t + 1] * df, order)  # polynomial regression
             C = np.polyval(rg, S[good_paths, t])  # evaluation of regression
 
             exercise = np.zeros(len(good_paths), dtype=bool)

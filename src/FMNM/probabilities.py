@@ -16,11 +16,13 @@ from math import factorial
 
 def Q1(k, cf, right_lim):
     """
-    P(X<k) - Probability to be in the money under the stock numeraire.
+    P(S>K) - Probability to be in the money under the stock numeraire.
+    k: log(K/S0). Negative log of the moneyness
     cf: characteristic function
     right_lim: right limit of integration
     """
 
+    # The offset avoids a potential singularity at -1j.
     def integrand(u):
         return np.real((np.exp(-u * k * 1j) / (u * 1j)) * cf(u - 1j) / cf(-1.0000000000001j))
 
@@ -29,7 +31,8 @@ def Q1(k, cf, right_lim):
 
 def Q2(k, cf, right_lim):
     """
-    P(X<k) - Probability to be in the money under the money market numeraire
+    P(S>K) - Probability to be in the money under the money market numeraire
+    k: log(K/S0).  Negative log of the moneyness 
     cf: characteristic function
     right_lim: right limit of integration
     """

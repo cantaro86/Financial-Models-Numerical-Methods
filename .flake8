@@ -1,7 +1,12 @@
 [flake8]
 ignore =
-	E266   # too many leading '#' for block comment
-    W605   # invalid escape sequence '\i' 
-	E203,  # E203: whitespace before ':'
-	W503   # W503: line break before binary operator
+	E266,
+    W605, 
+	E203,
+	W503,
 max-line-length = 120
+
+; E266   # too many leading '#' for block comment
+; W605   # invalid escape sequence '\i' 
+; E203,  # E203: whitespace before ':'
+; W503   # W503: line break before binary operator

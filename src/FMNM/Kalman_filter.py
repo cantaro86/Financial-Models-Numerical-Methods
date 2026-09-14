@@ -313,7 +313,7 @@ def plot_betas(X, Y, true_rho, rho_err, var_eta=None, training_size=250, rolling
         alpha=0.5,
         linewidth=2,
         color="seagreen",
-        label="Kalman Std Dev: $\pm 1 \sigma$",
+        label="Kalman Std Dev: $\\pm 1 \\sigma$",
     )
     plt.legend()
     plt.title("Kalman results")

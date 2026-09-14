@@ -10,7 +10,6 @@ from scipy import sparse
 from scipy.sparse.linalg import splu
 from time import time
 import numpy as np
-import scipy as scp
 from scipy import signal
 from scipy.integrate import quad
 import scipy.stats as ss
@@ -31,7 +30,7 @@ class VG_pricer:
     Finite-difference PIDE: Explicit-implicit scheme, with Brownian approximation
 
         0 = dV/dt + (r -(1/2)sig^2 -w) dV/dx + (1/2)sig^2 d^V/dx^2
-                 + \int[ V(x+y) nu(dy) ] -(r+lam)V
+                 + \\int[ V(x+y) nu(dy) ] -(r+lam)V
     """
 
     def __init__(self, Option_info, Process_info):
@@ -73,7 +72,9 @@ class VG_pricer:
         """
 
         def Psy(a, b, g):
-            f = lambda u: ss.norm.cdf(a / np.sqrt(u) + b * np.sqrt(u)) * u ** (g - 1) * np.exp(-u) / scps.gamma(g)
+            def f(u):
+                return ss.norm.cdf(a / np.sqrt(u) + b * np.sqrt(u)) * u ** (g - 1) * np.exp(-u) / scps.gamma(g)
+
             result = quad(f, 0, np.inf)
             return result[0]
 
@@ -141,7 +142,7 @@ class VG_pricer:
         t_init = time()
 
         S_T = self.exp_RV(self.S0, self.T, N)
-        V = scp.mean(np.exp(-self.r * self.T) * self.payoff_f(S_T), axis=0)
+        V = np.mean(np.exp(-self.r * self.T) * self.payoff_f(S_T), axis=0)
 
         if Err is True:
             if Time is True:
@@ -256,7 +257,8 @@ class VG_pricer:
             """integrator"""
             return (np.exp(y) - 1) * levy_m(y)
 
-        int_s = lambda y: np.abs(y) * np.exp(A * y - B * np.abs(y)) / self.kappa  # avoid division by zero
+        def int_s(y):
+            return np.abs(y) * np.exp(A * y - B * np.abs(y)) / self.kappa  # avoid division by zero
 
         w = (
             quad(int_w, -(extraP + 1.5) * dx, -eps)[0] + quad(int_w, eps, (extraP + 1.5) * dx)[0]
@@ -310,12 +312,12 @@ class VG_pricer:
             return self.price
 
     def plot(self, axis=None):
-        if type(self.S_vec) != np.ndarray or type(self.price_vec) != np.ndarray:
+        if not isinstance(self.S_vec, np.ndarray) or not isinstance(self.price_vec, np.ndarray):
             self.PIDE_price((5000, 4000))
 
         plt.plot(self.S_vec, self.payoff_f(self.S_vec), color="blue", label="Payoff")
         plt.plot(self.S_vec, self.price_vec, color="red", label="VG curve")
-        if type(axis) == list:
+        if isinstance(axis, list):
             plt.axis(axis)
         plt.xlabel("S")
         plt.ylabel("price")
@@ -324,7 +326,7 @@ class VG_pricer:
         plt.show()
 
     def mesh_plt(self):
-        if type(self.S_vec) != np.ndarray or type(self.mesh) != np.ndarray:
+        if not isinstance(self.S_vec, np.ndarray) or not isinstance(self.mesh, np.ndarray):
             self.PDE_price((7000, 5000))
 
         fig = plt.figure()
@@ -348,7 +350,8 @@ class VG_pricer:
         """
 
         def Phi(alpha, beta, gamm, x, y):
-            f = lambda u: u ** (alpha - 1) * (1 - u) ** (gamm - alpha - 1) * (1 - u * x) ** (-beta) * np.exp(u * y)
+            def f(u):
+                return u ** (alpha - 1) * (1 - u) ** (gamm - alpha - 1) * (1 - u * x) ** (-beta) * np.exp(u * y)
             result = quad(f, 0.00000001, 0.99999999)
             return (scps.gamma(gamm) / (scps.gamma(alpha) * scps.gamma(gamm - alpha))) * result[0]
 

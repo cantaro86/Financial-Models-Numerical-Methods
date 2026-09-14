@@ -153,8 +153,8 @@ If you want to create a new environment with the latest python version, you can 
 ```bash
 conda create -n FMNM python
 conda activate FMNM
-PACKAGES=$(tr '\n' ' ' < list_of_packages.txt | sed "s/arch/arch-py/g")
-conda install ${PACKAGES[@]}
+PACKAGES=( ${(f)"$(sed 's/^arch$/arch-py/' list_of_packages.txt)"} )
+conda install -c conda-forge "${(@)PACKAGES}"
 pip install -e .
 ```
 
